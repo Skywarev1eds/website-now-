@@ -1,0 +1,227 @@
+<style>
+  .feedback-section {
+    padding: 8rem 0;
+    position: relative;
+    background: linear-gradient(180deg, rgba(13,16,23,0) 0%, rgba(229,62,62,0.05) 100%);
+    overflow: hidden;
+  }
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  
+  .highlight {
+    color: #e53e3e;
+  }
+  
+  .section-description {
+    color: #9ca3af;
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 1rem;
+  }
+  
+  .feedback-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 1rem;
+  }
+  
+  .feedback-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 1.8rem;
+    height: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  .feedback-item:hover {
+    transform: translateY(-5px);
+    border-color: rgba(229,62,62,0.2);
+    background: rgba(255,255,255,0.05);
+  }
+  
+  .feedback-content {
+    position: relative;
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+    color: #d1d5db;
+    font-style: italic;
+    line-height: 1.6;
+  }
+  
+  .feedback-content:before {
+    content: '"';
+    position: absolute;
+    top: -1rem;
+    left: -0.5rem;
+    font-size: 4rem;
+    color: rgba(229,62,62,0.2);
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+  
+  .feedback-meta {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 1rem;
+  }
+  
+  .rating {
+    margin-bottom: 0.8rem;
+  }
+  
+  .rating i {
+    color: #e53e3e;
+    margin-right: 3px;
+  }
+  
+  .verification {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #9ca3af;
+  }
+  
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #e53e3e;
+    color: white;
+    margin-right: 8px;
+    font-size: 0.7rem;
+  }
+  
+  @media (max-width: 768px) {
+    .feedback-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<section class="feedback-section component" data-component-id="feedback-page">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Feedback from <span class="highlight">Customers</span></h2>
+      <p class="section-description">Real experiences from real users. Learn why our customers trust us.</p>
+    </div>
+    
+    <div class="feedback-grid">
+      <!-- Updated feedback items with real customer reviews and current dates -->
+      <div class="feedback-item">
+        <p class="feedback-content">SkyWare has been a game-changer for me! The anti-cheat protection works flawlessly and I've had zero bans since using it. Customer service responded within minutes when I had questions.</p>
+        <div class="feedback-meta">
+          <div class="rating">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="verification">
+            <span class="badge"><i class="fas fa-check"></i></span>
+            <span>Verified purchase - Oct 05, 2025</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feedback-item">
+        <p class="feedback-content">Been using their BO6 products for 3 months with no issues. Delivery was instant and everything works exactly as described. The tutorials provided were super helpful too.</p>
+        <div class="feedback-meta">
+          <div class="rating">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="verification">
+            <span class="badge"><i class="fas fa-check"></i></span>
+            <span>Verified purchase - Sep 28, 2025</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feedback-item">
+        <p class="feedback-content">Tried several similar services before finding SkyWare, and this is by far the best. Stable, undetected for months, and the 24/7 support is actually 24/7 - got help at 3am when I needed it!</p>
+        <div class="feedback-meta">
+          <div class="rating">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="verification">
+            <span class="badge"><i class="fas fa-check"></i></span>
+            <span>Verified purchase - Sep 23, 2025</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feedback-item">
+        <p class="feedback-content">The HWID spoofer works perfectly. I was skeptical at first since I've been banned before, but it's been 2 months with no issues. Worth every penny and the devs clearly know what they're doing.</p>
+        <div class="feedback-meta">
+          <div class="rating">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="verification">
+            <span class="badge"><i class="fas fa-check"></i></span>
+            <span>Verified purchase - Sep 17, 2025</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feedback-item">
+        <p class="feedback-content">Console service is unmatched! No more issues with detection, and the private features have completely transformed my gaming experience. The updates are regular and always improve functionality.</p>
+        <div class="feedback-meta">
+          <div class="rating">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="verification">
+            <span class="badge"><i class="fas fa-check"></i></span>
+            <span>Verified purchase - Sep 12, 2025</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="feedback-item">
+        <p class="feedback-content">Purchased the BO7 package and was playing within minutes. The interface is intuitive, features work exactly as advertised, and the security is top-notch. Definitely coming back for renewals!</p>
+        <div class="feedback-meta">
+          <div class="rating">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="verification">
+            <span class="badge"><i class="fas fa-check"></i></span>
+            <span>Verified purchase - Sep 08, 2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

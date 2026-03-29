@@ -1,0 +1,84 @@
+<style>
+/* Main container based on your new class name */
+.gameIconsList {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 1rem 0; /* ANGEPASST: Fügt Platz für den Hover-Effekt hinzu */
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+
+/* The track that contains and animates the icons */
+.game-icons__track {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  width: fit-content;
+  animation: marquee 150s linear infinite;
+  will-change: transform;
+}
+.gameIconsList:hover .game-icons__track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Styled container for each logo, using your new class name */
+.game-icons__item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  opacity: 0.7;
+  overflow: hidden;
+}
+
+/* The refined hover effect with the red glow */
+.game-icons__item:hover {
+  opacity: 1;
+  border-color: var(--cl-accent);
+  transform: scale(1.1); /* Nur Skalierung, keine Verschiebung */
+  box-shadow: 0 0 25px color-mix(in srgb, var(--cl-accent) 30%, transparent);
+}
+
+/* The image itself, using your new class name */
+.game-icons__image {
+  max-height: 45px;
+  width: auto;
+  max-width: 60px;
+  border-radius: 8px;
+}
+</style>
+
+<section class="gameIconsList component" data-component-id="game-icons">
+  <div class="game-icons__track">
+    {% set icons = [
+      "https://i.ibb.co/4Rd7TYVZ/bo7-call-of-duty.png",
+      "https://i.ibb.co/N2ws81rH/image.png",
+      "https://i.ibb.co/8g7pjzmf/image.png",
+      "https://i.ibb.co/S7VV5sns/image.png",
+      "https://i.ibb.co/ns9c378k/image.png",
+      "https://i.ibb.co/21HDHr7k/image.png",
+      "https://i.ibb.co/LzBqKJHW/image.png"
+    ] %}
+
+    <!-- The content is duplicated to ensure a seamless loop -->
+    {% for i in range(0, 4) %}
+      {% for icon_url in icons %}
+        <div class="game-icons__item">
+          <img src="{{ icon_url }}" alt="Game Icon" class="game-icons__image">
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</section>

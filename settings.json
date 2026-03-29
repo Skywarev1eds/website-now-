@@ -1,0 +1,387 @@
+{
+    "templates": {
+        "shop": {
+            "layout": "master",
+            "components": {
+                "hero": {
+                    "type": "hero",
+                    "properties": {
+                        "title": "Welcome to {{ shop.name }}!",
+                        "subtitle": "{{ shop.description }}",
+                        "cta": null,
+                        "cta_text": null,
+                        "show_searchbar": true,
+                        "show_feedback_rating": true,
+                        "show_products_sold": true,
+                        "show_total_customers": true,
+                        "alignment": "center",
+                        "height": "medium",
+                        "background_image": "DEFAULT",
+                        "side_image": null
+                    }
+                },
+                "products": {
+                    "type": "products",
+                    "properties": {
+                        "title": "Our Products",
+                        "subtitle": "Browse our selection of premium software"
+                    }
+                },
+                "faq-1752591700489": {
+                    "type": "faq",
+                    "properties": {
+                        "title": "FAQ",
+                        "subtitle": null,
+                        "items": [
+                            {
+                                "question": "How do I get started?",
+                                "answer": "It's simple! Browse our product catalog, select the software that fits your needs, and complete the secure checkout. You'll get instant access and setup instructions right after your purchase."
+                            },
+                            {
+                                "question": "What payment methods are accepted?",
+                                "answer": "We accept a wide range of payments including cryptocurrencies like Bitcoin and Litecoin, as well as traditional methods via PayPal and credit\/debit cards through Stripe."
+                            }
+                        ]
+                    }
+                },
+                "socials-1752532442972": {
+                    "type": "socials",
+                    "properties": {
+                        "title": "Payment Methods",
+                        "subtitle": "Secure, Encrypted, and Trusted Transactions"
+                    }
+                },
+                "text-block-1760592119310": {
+                    "type": "text-block",
+                    "properties": {
+                        "headline": null,
+                        "title": "Text Block",
+                        "subtitle": null,
+                        "text": "This is a text block.",
+                        "buttons": [
+                            {
+                                "text": "Shop Now",
+                                "icon": null,
+                                "link": "#products",
+                                "new_tab": false,
+                                "color": "primary",
+                                "style": "regular"
+                            },
+                            {
+                                "text": "About Us",
+                                "icon": null,
+                                "link": "#about-us",
+                                "new_tab": false,
+                                "color": "secondary",
+                                "style": "outline"
+                            }
+                        ],
+                        "show_background": false,
+                        "title_alignment": "left",
+                        "content_alignment": "left"
+                    }
+                }
+            },
+            "components_order": [
+                "hero",
+                "products",
+                "socials-1752532442972",
+                "text-block-1760592119310",
+                "faq-1752591700489"
+            ]
+        },
+        "cart": {
+            "layout": "master",
+            "components": {
+                "cart-page": {
+                    "type": "cart-page",
+                    "properties": []
+                }
+            },
+            "components_order": [
+                "cart-page"
+            ]
+        },
+        "product": {
+            "layout": "master",
+            "components": {
+                "product-page": {
+                    "type": "product-page",
+                    "properties": {
+                        "variant_selector": "buttons",
+                        "show_feedbacks": true,
+                        "feedbacks_amount": 4,
+                        "hide_add_to_cart": false,
+                        "hide_buy_now": false
+                    }
+                }
+            },
+            "components_order": [
+                "product-page"
+            ]
+        },
+        "feedback": {
+            "layout": "master",
+            "components": {
+                "feedback-page": {
+                    "type": "feedback-page",
+                    "properties": {
+                        "headline": "Average rating: {{ shop.average_rating }}",
+                        "title": "Customer <span class=\"text-accent-500\">Reviews<\/span>",
+                        "hide_sorting": false
+                    }
+                }
+            },
+            "components_order": [
+                "feedback-page"
+            ]
+        },
+        "status": {
+            "layout": "master",
+            "components": {
+                "status-page": {
+                    "type": "status-page",
+                    "properties": {
+                        "title": "Product <span class=\"text-accent-500\">Status<\/span>"
+                    }
+                }
+            },
+            "components_order": [
+                "status-page"
+            ]
+        },
+        "terms": {
+            "layout": "master",
+            "components": {
+                "terms-page": {
+                    "type": "terms-page",
+                    "properties": {
+                        "title": "Terms of <span class=\"text-accent-500\">Service<\/span>"
+                    }
+                }
+            },
+            "components_order": [
+                "terms-page"
+            ]
+        },
+        "privacy-policy": {
+            "layout": "master",
+            "components": {
+                "privacy-policy-page": {
+                    "type": "privacy-policy-page",
+                    "properties": {
+                        "title": "Privacy <span class=\"text-accent-500\">Policy<\/span>"
+                    }
+                }
+            },
+            "components_order": [
+                "privacy-policy-page"
+            ]
+        },
+        "refund-policy": {
+            "layout": "master",
+            "components": {
+                "refund-policy-page": {
+                    "type": "refund-policy-page",
+                    "properties": {
+                        "title": "Refund <span class=\"text-accent-500\">Policy<\/span>"
+                    }
+                }
+            },
+            "components_order": [
+                "refund-policy-page"
+            ]
+        },
+        "blog": {
+            "layout": "master",
+            "components": {
+                "blog-page": {
+                    "type": "blog-page",
+                    "properties": {
+                        "title": "Our <span class=\"text-accent-500\">Blog<\/span>",
+                        "enlarge_newest_post": true
+                    }
+                }
+            },
+            "components_order": [
+                "blog-page"
+            ]
+        },
+        "blog-post": {
+            "layout": "master",
+            "components": {
+                "blog-post": {
+                    "type": "blog-post-page",
+                    "properties": []
+                }
+            },
+            "components_order": [
+                "blog-post-page"
+            ]
+        },
+        "customer-dashboard": {
+            "layout": "master",
+            "components": [],
+            "components_order": []
+        },
+        "customer-invoices": {
+            "layout": "master",
+            "components": [],
+            "components_order": []
+        },
+        "customer-tickets": {
+            "layout": "master",
+            "components": [],
+            "components_order": []
+        },
+        "customer-ticket": {
+            "layout": "master",
+            "components": [],
+            "components_order": []
+        },
+        "customer-balance": {
+            "layout": "master",
+            "components": [],
+            "components_order": []
+        },
+        "customer-affiliate": {
+            "layout": "master",
+            "components": [],
+            "components_order": []
+        },
+        "maintenance": {
+            "layout": "master",
+            "components": [],
+            "components_order": []
+        }
+    },
+    "global": {
+        "properties": {
+            "accent_color": "#e53e3e",
+            "background_color": "#101114",
+            "text_primary_color": "#ffffff",
+            "text_accent_color": "#ffffff",
+            "font": "Poppins",
+            "product_image_fit": "cover",
+            "group_image_fit": "cover",
+            "snow": false,
+            "snow_color": "#ffffff"
+        },
+        "components": {
+            "announcement": {
+                "text": null,
+                "link": null,
+                "link_text": null
+            },
+            "navbar": {
+                "show_shop_name": true,
+                "show_logo": true,
+                "left_links": [
+                    {
+                        "text": "Home",
+                        "link": "\/",
+                        "shape": "regular"
+                    },
+                    {
+                        "text": "Products",
+                        "link": "\/#products",
+                        "shape": "regular"
+                    },
+                    {
+                        "text": "Status",
+                        "link": "\/status",
+                        "shape": "regular"
+                    },
+                    {
+                        "text": "Terms of Service",
+                        "link": "\/terms",
+                        "shape": "regular"
+                    }
+                ],
+                "right_links": [
+                    {
+                        "text": "Join Discord",
+                        "link": "{{ shop.discord_url }}",
+                        "shape": "button"
+                    }
+                ],
+                "hide_currency_selector": false,
+                "hide_customer_dashboard": false,
+                "hide_cart": false
+            },
+            "footer": {
+                "show_shop_name": true,
+                "show_logo": true,
+                "show_socials": true,
+                "copyright": "Copyright \u00a9 {{ shop.name }} {{ '' | currentYear }}",
+                "links_title": "Navigation",
+                "links": [
+                    {
+                        "text": "Home",
+                        "link": "\/"
+                    },
+                    {
+                        "text": "Products",
+                        "link": "\/#products"
+                    },
+                    {
+                        "text": "Status",
+                        "link": "\/status"
+                    },
+                    {
+                        "text": "Terms of Service",
+                        "link": "\/terms"
+                    },
+                    {
+                        "text": "Feedback",
+                        "link": "\/feedback"
+                    }
+                ],
+                "links_2_title": "My Account",
+                "links_2": [
+                    {
+                        "text": "Dashboard",
+                        "link": "\/customer\/dashboard"
+                    },
+                    {
+                        "text": "Orders",
+                        "link": "\/customer\/orders"
+                    },
+                    {
+                        "text": "Tickets",
+                        "link": "\/customer\/tickets"
+                    }
+                ],
+                "links_3_title": "Legal",
+                "links_3": [
+                    {
+                        "text": "Terms of Service",
+                        "link": "\/terms-of-service"
+                    },
+                    {
+                        "text": "Privacy Policy",
+                        "link": "\/privacy-policy"
+                    },
+                    {
+                        "text": "Refund Policy",
+                        "link": "\/refund-policy"
+                    }
+                ]
+            },
+            "coupon": {
+                "enabled": false,
+                "show_logo": false,
+                "headline": "Special Offer",
+                "title": "Save 10% Today!",
+                "description": "Get an exclusive discount on your next purchase. Limited time offer!",
+                "coupon_code": "COUPONCODE",
+                "instructions": "Enter the coupon code at checkout.",
+                "continue_button_text": "Shop Now",
+                "dismiss_button_text": "Maybe Later",
+                "show_after_seconds": 5,
+                "forget_after_hours": 24,
+                "homepage_only": true
+            }
+        }
+    }
+}

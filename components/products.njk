@@ -1,0 +1,171 @@
+{#
+  PRODUKT-SEKTION - V2.7 (REDUZIERTER ABSTAND)
+#}
+<style>
+  .group-modal-item {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .modal-final-design {
+    background: radial-gradient(circle at 50% 0%, rgba(229, 62, 62, 0.1), transparent 40%), #11151c;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.25rem;
+    position: relative;
+  }
+  .modal-final-design > * {
+    position: relative;
+    z-index: 1;
+  }
+  .products-section {
+    padding-top: 2.5rem;
+  }
+  /* Stile für das neue "Featured"-Badge */
+  .featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #a0aec0;
+  }
+  .featured-badge i {
+    color: var(--cl-accent, #e53e3e);
+  }
+</style>
+
+<section
+  id="{{ componentId }}"
+  class="component relative products-section"
+  data-component-id="{{ componentId }}"
+  x-data="{
+    searchTerm: '',
+    openGroupModalId: null,
+    openGroupModal(id) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      document.body.style.overflow = 'hidden';
+      this.openGroupModalId = id;
+      
+      this.$nextTick(() => {
+        const items = document.querySelectorAll(`.modal-${id} .group-modal-item`);
+        items.forEach((item, index) => {
+          setTimeout(() => {
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+          }, 250 + (index * 90));
+        });
+      });
+    },
+    closeGroupModal() {
+      document.body.style.overflow = 'auto';
+      document.body.style.paddingRight = '0px';
+      this.openGroupModalId = null;
+    }
+  }"
+>
+  <div class="container mx-auto flex flex-col items-center text-center px-4">
+    
+    <!-- MODERNISIERTER HEADER-BEREICH -->
+    <div class="flex flex-col items-center max-w-xl text-center mb-8">
+      <div class="text-center mb-4">
+        <span class="featured-badge">
+          <i class="fas fa-star"></i>
+          FEATURED
+        </span>
+      </div>
+      <h2 class="text-5xl !leading-tight font-bold text-t-primary" data-dsr>
+        Explore Our Products
+      </h2>
+      <p class="text-base text-t-primary/60 mt-2" data-dsr>
+        Discover our range of products designed to enhance your gaming experience.
+      </p>
+    </div>
+
+    {% if properties.show_searchbar %}
+      <div class="flex items-center gap-4 w-full mb-4 bg-white/5 text-accent-200 rounded-xl px-4 cursor-pointer focus-within:ring-2 focus-within:ring-accent-500" data-dsr>
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"><path fill="currentColor" d="M9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l5.6 5.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-5.6-5.6q-.75.6-1.725.95T9.5 16m0-2q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14"/></svg>
+        <input x-model="searchTerm" type="text" class="flex-1 py-4 bg-transparent focus:outline-none" placeholder="Search for products..." />
+      </div>
+    {% endif %}
+
+    <div 
+      x-data
+      x-init="() => {
+        import('https://cdn.jsdelivr.net/npm/@formkit/auto-animate')
+          .then(module => module.default($el));
+      }"
+      class="flex flex-wrap -mx-2 w-full {{ 'justify-center' if properties.centered }}"
+    >
+      {% if properties.ids|length == 0 %}
+        {% for product in sortedItems %}
+          {% if product.type == 'group' or not product.group_id %}
+            <div
+              x-show="searchTerm == '' || '{{ product.name | lower }}'.includes(searchTerm.toLowerCase())"
+              x-transition
+              x-cloak
+              class="w-full sm:w-1/2 lg:w-1/4 p-2"
+            >
+              {% render_snippet "product-card.njk", product=product %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {% for product in helpers.components.products.getItemsByIds(sortedItems, properties.ids) %}
+          <div
+            x-show="searchTerm == '' || '{{ product.name | lower }}'.includes(searchTerm.toLowerCase())"
+            x-transition
+            x-cloak
+            class="w-full sm:w-1/2 lg:w-1/4 p-2"
+          >
+          {% render_snippet "product-card.njk", product=product %}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  {% for product_group in sortedItems %}
+  {% if product_group.type == 'group' %}
+  <div x-show="openGroupModalId == '{{ product_group.id }}'" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none;">
+    <div class="flex items-center justify-center min-h-screen px-4 text-center">
+        <div x-cloak @click="closeGroupModal" x-show="openGroupModalId == '{{ product_group.id }}'" 
+          x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+          x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+          class="fixed inset-0 transition-opacity bg-black/70 backdrop-blur-md" aria-hidden="true"
+        ></div>
+        
+        <div 
+          x-cloak 
+          x-show="openGroupModalId == '{{ product_group.id }}'" 
+          x-transition:enter="transition-all ease-[cubic-bezier(0.34,1.56,0.64,1)] duration-500" 
+          x-transition:enter-start="opacity-0 translate-y-8 scale-90" 
+          x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+          x-transition:leave="transition ease-in duration-200" 
+          x-transition:leave-start="opacity-100 scale-100" 
+          x-transition:leave-end="opacity-0 scale-95"
+          class="modal-{{ product_group.id }} modal-final-design relative inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle shadow-2xl shadow-black/50"
+        >
+          <div class="relative text-center px-6 py-2">
+            <h3 class="text-xl font-bold text-white">{{ product_group.name }}</h3>
+            <button @click="closeGroupModal" class="absolute top-0 right-0 mt-2 mr-5 p-2 text-white/50 transition-colors rounded-full focus:outline-none hover:bg-white/10 hover:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="currentColor" d="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></svg>
+            </button>
+          </div>
+          <div class="flex flex-col gap-1 p-4">
+            {% for product in product_group.products %}
+              <div class="group-modal-item">
+                {% render_snippet "product-card-horizontal.njk", product=product %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+</section>

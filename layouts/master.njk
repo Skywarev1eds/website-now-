@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 🚫 Noscript (Schutz bleibt erhalten) -->
+    <noscript>
+      <meta http-equiv="refresh" content="0;url=https://google.com">
+      <style>body { display: none !important; }</style>
+    </noscript>
+    
+    {% render_snippet "meta-tags.njk" %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+    <link href="{{ 'built.css' | assetUrl }}" rel="stylesheet" />
+    <link href="{{ 'custom.css' | assetUrl }}" rel="stylesheet" />
+    <link href="{{ 'customer-styles.css' | assetUrl }}" rel="stylesheet" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link 
+      href="https://fonts.googleapis.com/css2?family={{ (global.properties.font | default('Poppins')) | replace(' ', '+') }}:wght@300;400;500;600;700;800;900&display=swap" 
+      rel="stylesheet"
+    >
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/styles/choices.min.css" rel="stylesheet" crossorigin="anonymous" />
+
+    <!-- Globale Styles, die auf settings.json hören -->
+    <style id="theme-styles">
+      :root {
+        --cl-accent: {{ global.properties.theme_color | default('#e53e3e') }};
+        /* --cl-accent-rgb wird jetzt per Skript gesetzt */
+        --cl-background-primary: {{ global.properties.primary_background_color | default('#141414') }};
+        --cl-background-secondary: {{ global.properties.secondary_background_color | default('#1B1B2C') }};
+        --cl-border: {{ global.properties.primary_border_color | default('rgba(255, 255, 255, 0.08)') }};
+        --font-primary: '{{ global.properties.font | default('Poppins') }}', sans-serif;
+      }
+      body {
+        background-color: var(--cl-background-primary);
+        font-family: var(--font-primary);
+        position: relative;
+        overflow-x: hidden;
+      }
+      .global-grid-overlay {
+          position: fixed;
+          inset: 0;
+          background-image:
+              linear-gradient(var(--cl-border) 1px, transparent 1px),
+              linear-gradient(to right, var(--cl-border) 1px, transparent 1px);
+          background-size: 40px 40px;
+          opacity: 0.1;
+          z-index: -2;
+          pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body x-data="{ isMenuOpen: false }">
+    <!-- Globale Hintergrund-Elemente -->
+    <div class="global-grid-overlay"></div>
+
+    <div class="flex-wrapper" id="app" x-data="app">
+      <div>
+        <header>
+          {% render_component "announcement" %}
+          {% render_component "navbar" %}
+        </header>
+        {{ templateContent | safe }}
+      </div>
+      {% render_component "footer" %}
+      {% render_snippet "customer-login-modal.njk" %}
+    </div>
+
+    <script>
+      // Konvertiert eine Hex-Farbe in einen RGB-String und setzt die CSS-Variable
+      function setRgbVarFromHex(hexColor) {
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hexColor = hexColor.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor);
+        if (result) {
+          const r = parseInt(result[1], 16);
+          const g = parseInt(result[2], 16);
+          const b = parseInt(result[3], 16);
+          document.documentElement.style.setProperty('--cl-accent-rgb', `${r}, ${g}, ${b}`);
+        }
+      }
+      setRgbVarFromHex('{{ global.properties.theme_color | default("#e53e3e") }}');
+    </script>
+    
+    <script>
+      window.shopId = {{ shop.id | json | default('null') }};
+      window.apiBaseUrl = "{{ '/' | apiInternalUrl }}";
+      window.currencyRatesUsd = {{ currency_rates_usd | json | default('{}') }};
+      window.defaultCurrency = {{ currency | json | default('"USD"') }};
+      window.shopCustomer = {{ shop_customer | json | default('null') }};
+    </script>
+    {% if isBuilder %}{% render_snippet "script-builder.njk" %}{% endif %}
+    {% if altcha or altcha_shop_customer %}<script type="module">import altcha from 'https://cdn.jsdelivr.net/npm/altcha@1.2.0/+esm'</script>{% elif shop.recaptcha_key %}<script src="https://www.google.com/recaptcha/api.js?render={{ shop.recaptcha_key }}"></script>{% endif %}
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js" crossorigin="anonymous"></script>
+    <script src="{{ 'script.js' | assetUrl }}" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" crossorigin="anonymous"></script>
+    
+    {% render_snippet "script-integrations.njk" %}
+
+    {% raw %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Scroll Animations (diese Funktion bleibt erhalten)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.scroll-animate').forEach(el => {
+            observer.observe(el);
+        });
+      });
+    </script>
+    {% endraw %}
+    
+    <!-- NEUES, SICHERES SCHUTZ-SKRIPT -->
+    <script>
+      (function() {
+        // Deaktiviert das Rechtsklick-Kontextmenü
+        document.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+        }, false);
+
+        // Blockiert gängige Tastenkombinationen zum Öffnen der DevTools
+        document.addEventListener('keydown', function(e) {
+          // F12
+          if (e.keyCode === 123) {
+            e.preventDefault();
+          }
+          // Strg+Shift+I
+          if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+            e.preventDefault();
+          }
+          // Strg+Shift+J
+          if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+            e.preventDefault();
+          }
+          // Strg+U
+          if (e.ctrlKey && e.keyCode === 85) {
+            e.preventDefault();
+          }
+          // Strg+S
+          if (e.ctrlKey && e.keyCode === 83) {
+            e.preventDefault();
+          }
+        }, false);
+      })();
+    </script>
+
+    <style>*{-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;user-select:none}</style>
+  </body>
+</html>

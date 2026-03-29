@@ -1,0 +1,210 @@
+{#
+  Product Page - V6 (Redesign based on the "BO7 Zenith" example)
+  This version implements the compact, two-column layout provided by the user.
+  All HTML, logic, and CSS are in this single file to ensure it works correctly.
+#}
+
+{% set imgScaleClass = ('object-scale-down' if global.properties.product_image_fit == 'scale-down' else 'object-cover') %}
+
+<section class="component product-wrapper-v6" data-component-id="{{ componentId }}">
+  <div class="container py-5">
+
+    <!-- HAUPTKARTE (Bild + Kaufen) -->
+    <div class="xph-card-v6">
+      <div class="xph-grid-v6" x-data="productForm">
+        
+        <!-- LINKE SPALTE: BILD -->
+        <div class="xph-left-v6">
+          <div class="xph-hero-v6">
+            {% if product.image_urls|length > 0 %}
+              <img src="{{ product.image_urls[0] }}" alt="{{ product.name }}">
+            {% elif product.image_url %}
+              <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% else %}
+              <div class="xph-image-placeholder-v6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" viewBox="0 0 16 16"><path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z"/></svg>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- RECHTE SPALTE: KAUF-INFORMATIONEN -->
+        <div class="xph-right-v6">
+          <h1 class="xph-title-v6">{{ product.name }}</h1>
+
+          {% if 'views' in liveStats or 'sales' in liveStats %}
+            <div class="xph-meta-row-v6">
+              <div class="x-live-chips-v6">
+                {% if 'views' in liveStats %}
+                  <span class="chip-v6">
+                    <i class="dot-v6" style="--c:#10d98d"></i>
+                    <strong>{{ liveStats.views }}</strong>
+                    <span class="label-v6">viewing</span>
+                  </span>
+                {% endif %}
+                {% if 'sales' in liveStats %}
+                  <span class="chip-v6">
+                    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M7 18a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm10 0a2 2 0 1 1 0 3.999A2 2 0 0 1 17 18ZM3 4h2l3.6 7.59-1.35 2.45A2 2 0 0 0 7 16h10a2 2 0 0 0 1.79-1.11L21 8H7"></path></svg>
+                    <strong>{{ liveStats.sales }}</strong>
+                    <span class="label-v6">purchased</span>
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="xph-price-v6" x-text="appCurrency.format(totalPrice, '{{ product.currency }}')"></div>
+          <div class="xph-sub-v6">SELECT PRICE PER KEY</div>
+
+          <form @submit.prevent="buyNow">
+            <!-- MENGE -->
+            <div class="my-4">
+              <label for="quantity" class="xph-sub-v6">QUANTITY</label>
+              <div class="quantity-input-v6">
+                <button @click="changeQuantity(quantity - 1)" type="button" :disabled="outOfStock || quantity <= minQuantity">-</button>
+                <input type="number" name="quantity" x-model.number="quantity" :disabled="outOfStock">
+                <button @click="changeQuantity(quantity + 1)" type="button" :disabled="outOfStock || quantity >= maxQuantity">+</button>
+              </div>
+            </div>
+
+            <!-- KAUF-BUTTONS -->
+            <div class="buy-buttons-v6">
+              {% if not properties.hide_add_to_cart %}
+                <button type="button" x-on:click="addToCart" class="btn-add-to-cart-v6" :disabled="outOfStock || addingToCart">
+                  <span x-show="!addingToCart && !addedToCart">Add to Cart</span>
+                  <span x-show="addingToCart">Adding...</span>
+                  <span x-show="addedToCart">Go to Cart</span>
+                </button>
+              {% endif %}
+              {% if not properties.hide_buy_now %}
+                <button type="submit" class="btn-buy-now-v6" :disabled="outOfStock || buyingNow">
+                  <span x-show="!buyingNow">Buy Now</span>
+                  <span x-show="buyingNow">Processing...</span>
+                </button>
+              {% endif %}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- BESCHREIBUNGS-KARTE -->
+    <div class="xph-desc-card-v6">
+      <div class="xph-desc-head-v6">
+        <span class="pill-v6">Description</span>
+      </div>
+      <div class="xph-desc-body-v6 editor">
+        {{ product.description | safe }}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================== -->
+<!-- CSS & JAVASCRIPT (DIREKT INTEGRIERT) -->
+<!-- ================================================== -->
+
+<style>
+/* Globale Stile für die neue Seite */
+.product-wrapper-v6 { color: #fff; background-color: #12121F; }
+.xph-card-v6 { background: #1B1B2C; border-radius: 0.75rem; padding: 2rem; border: 1px solid rgba(255,255,255,0.07); }
+.xph-grid-v6 { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+@media (min-width: 992px) { .xph-grid-v6 { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 3rem; } }
+
+/* Linke Spalte: Bilder */
+.xph-hero-v6 { border-radius: 0.5rem; overflow: hidden; aspect-ratio: 16/9; background-color: #12121F; }
+.xph-hero-v6 img { width: 100%; height: 100%; object-fit: cover; }
+.xph-image-placeholder-v6 { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.1); }
+
+/* Rechte Spalte: Kaufen */
+.xph-right-v6 { display: flex; flex-direction: column; }
+.xph-title-v6 { font-size: 2rem; font-weight: 700; margin-bottom: 0.75rem; line-height: 1.2; }
+.xph-meta-row-v6 { display: flex; align-items: center; margin-bottom: 1.5rem; }
+.x-live-chips-v6 { display: flex; gap: 0.5rem; }
+.chip-v6 { display: flex; align-items: center; gap: 0.35rem; background: #2A2A40; padding: 0.25rem 0.6rem; border-radius: 0.25rem; font-size: 0.75rem; }
+.chip-v6 .dot-v6 { width: 8px; height: 8px; border-radius: 50%; background-color: var(--c); }
+.chip-v6 strong { font-weight: 600; }
+.chip-v6 .label-v6 { color: rgba(255,255,255,0.6); }
+
+.xph-price-v6 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+.xph-sub-v6 { font-size: 0.7rem; font-weight: 600; color: rgba(255,255,255,0.4); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.75rem; }
+
+/* Mengenauswahl */
+.quantity-input-v6 { display: flex; border: 1px solid #2A2A40; border-radius: 0.375rem; overflow: hidden; background: #2A2A40; }
+.quantity-input-v6 input {
+  width: 100%; background: transparent; color: #fff; text-align: center;
+  border: none; padding: 0.5rem; font-size: 1rem;
+}
+.quantity-input-v6 input:focus { outline: none; }
+.quantity-input-v6 button {
+  width: 40px; background: transparent; border: none; color: #fff; font-size: 1.25rem;
+  transition: background-color 0.2s ease;
+}
+.quantity-input-v6 button:not(:disabled):hover { background-color: #363652; }
+.quantity-input-v6 button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Kauf-Buttons */
+.buy-buttons-v6 { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.buy-buttons-v6 button {
+  padding: 0.75rem 1rem; border-radius: 0.375rem;
+  font-size: 1rem; font-weight: 600; border: none;
+  transition: all 0.2s ease;
+}
+.btn-add-to-cart-v6 { flex-grow: 1; background-color: #E53935; color: #fff; }
+.btn-add-to-cart-v6:not(:disabled):hover { background-color: #C62828; }
+.btn-buy-now-v6 { background-color: transparent; color: #fff; }
+.btn-buy-now-v6:not(:disabled):hover { background-color: #2A2A40; }
+.buy-buttons-v6 button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Beschreibung */
+.xph-desc-card-v6 { margin-top: 1.5rem; background: #1B1B2C; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.07); }
+.xph-desc-head-v6 { padding: 0.75rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.pill-v6 { background: #E53935; padding: 0.25rem 0.75rem; border-radius: 99px; font-size: 0.8rem; font-weight: 600; }
+.xph-desc-body-v6 { padding: 1.5rem; color: rgba(255,255,255,0.7); line-height: 1.7; }
+</style>
+
+<script>
+  // Alpine.js Logik für das Produktformular (unverändert)
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('productForm', () => ({
+      product: {{ product | json }},
+      activeVariant: 0,
+      quantity: 1,
+      addingToCart: false, addedToCart: false,
+      buyingNow: false, buyNowError: null,
+      
+      init() {
+        const firstAvailable = this.product.variants.findIndex(v => v.stock !== 0);
+        this.activeVariant = firstAvailable >= 0 ? firstAvailable : 0;
+        this.quantity = this.variant.quantity_min || 1;
+        this.$watch('activeVariant', () => {
+          this.quantity = this.variant.quantity_min || 1;
+          this.addedToCart = false;
+        });
+      },
+      
+      get variant() { return this.product.variants[this.activeVariant]; },
+      get outOfStock() { return this.variant && this.variant.stock === 0; },
+      get minQuantity() { return this.variant.quantity_min || 1; },
+      get maxQuantity() { return this.variant.quantity_max || 999; },
+      get totalPrice() { return (this.variant.price * this.quantity).toFixed(2); },
+      
+      changeQuantity(newQty) {
+        this.quantity = Math.max(this.minQuantity, Math.min(newQty, this.maxQuantity));
+      },
+      
+      addToCart() {
+        if (this.addedToCart) { window.location.href = '{{ '/cart' | shopUrl }}'; return; }
+        this.addingToCart = true;
+        this.appCart.add(this.product.id, this.variant.id, this.quantity);
+        setTimeout(() => { this.addedToCart = true; this.addingToCart = false; }, 1000);
+      },
+
+      async buyNow() {
+        this.buyingNow = true; this.buyNowError = null;
+        console.log("Buying now:", { productId: this.product.id, variantId: this.variant.id, quantity: this.quantity });
+        setTimeout(() => { this.buyingNow = false; }, 2000);
+      }
+    }));
+  });
+</script>

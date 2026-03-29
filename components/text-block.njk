@@ -1,0 +1,167 @@
+<style>
+/* Direkte CSS-Anpassungen für die Socials-Komponente */
+#socials-container-final {
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-primary, 'Poppins', sans-serif);
+}
+.socials-content-wrapper-final {
+  position: relative;
+  z-index: 1;
+}
+.socials-inner-container-final {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
+}
+.socials-flex-layout-final {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.socials-left-side-final {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+}
+.socials-logo-final {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+.socials-title-final {
+  color: var(--cl-t-light, #ffffff);
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 600;
+}
+/* KORRIGIERT: Rote Farbe für "Follow" hinzugefügt */
+.socials-title-highlight-final {
+  color: var(--cl-accent, #e53e3e);
+}
+#socials-container-final {
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-primary, 'Poppins', sans-serif);
+  margin-bottom: 0.1rem; /* Verringert den Abstand nach unten */
+}
+#socials-container-final {
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-primary, 'Poppins', sans-serif);
+  margin-top: 2rem; /* Verringert den Abstand nach oben */
+}
+.socials-right-side-final {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.social-icon-group-final {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.social-icon-span-final {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.social-icon-span-final:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.social-icon-final {
+  font-size: 1.75rem;
+}
+
+/* Spezifische Farben */
+.discord-icon-final {
+  background-color: rgba(88, 101, 242, 0.1);
+  border: 1px solid rgba(88, 101, 242, 0.3);
+  color: #5865f2;
+}
+.social-icon-group-final:hover .discord-icon-final {
+  background-color: rgba(88, 101, 242, 0.2);
+  border-color: #5865f2;
+}
+.tiktok-icon-final {
+  background-color: rgba(0, 242, 234, 0.1);
+  border: 1px solid rgba(0, 242, 234, 0.3);
+  color: #00f2ea;
+}
+.social-icon-group-final:hover .tiktok-icon-final {
+  background-color: rgba(0, 242, 234, 0.2);
+  border-color: #00f2ea;
+}
+.youtube-icon-final {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  color: #ff0000;
+}
+.social-icon-group-final:hover .youtube-icon-final {
+  background-color: rgba(255, 0, 0, 0.2);
+  border-color: #ff0000;
+}
+
+/* Responsive Design für Laptops und größer */
+@media (min-width: 1024px) {
+  .socials-flex-layout-final {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+</style>
+
+<section id="socials-container-final" class="component" data-component-id="{{ componentId }}">
+  
+  <div class="socials-content-wrapper-final">
+    <div class="socials-inner-container-final">
+      <div class="socials-flex-layout-final">
+        <div class="socials-left-side-final">
+          <img src="{{ shop.logo_url | default('https://i.ibb.co/0V8tqcYT/logo.png') }}" class="socials-logo-final">
+          <h2 class="socials-title-final">
+            <span class="socials-title-highlight-final">Follow</span> Our Socials
+          </h2>
+        </div>
+        <div class="socials-right-side-final">
+          
+          {% if shop.discord_url %}
+          <a href="{{ shop.discord_url }}" target="_blank" class="social-icon-group-final">
+            <span class="social-icon-span-final discord-icon-final">
+              <i class="fab fa-discord social-icon-final"></i>
+            </span>
+          </a>
+          {% endif %}
+
+          {% if shop.tiktok_url %}
+          <a href="{{ shop.tiktok_url }}" target="_blank" class="social-icon-group-final">
+            <span class="social-icon-span-final tiktok-icon-final">
+                <i class="fab fa-tiktok social-icon-final"></i>
+            </span>
+          </a>
+          {% endif %}
+          
+          {% if shop.youtube_url %}
+          <a href="{{ shop.youtube_url }}" target="_blank" class="social-icon-group-final">
+            <span class="social-icon-span-final youtube-icon-final">
+              <i class="fab fa-youtube social-icon-final"></i>
+            </span>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,15 @@
+<div class="components">
+  {% for componentId in components_order %}
+    {% if componentId == 'products' %}
+      {% render_component 'game-icons' %}
+      <div class="section-spacer"></div>
+    {% endif %}
+
+    {% render_component componentId %}
+
+    {# Fügt nach jeder Komponente einen Spacer hinzu, außer bei 'hero' oder der letzten Komponente #}
+    {% if not loop.last and componentId != 'hero' %}
+      <div class="section-spacer"></div>
+    {% endif %}
+  {% endfor %}
+</div>

@@ -1,0 +1,20 @@
+<section class="component" data-component-id="{{ componentId }}">
+  <div class="container mx-auto">
+    <div class="py-32 relative mb-8">
+      <div class="m-auto absolute inset-0 -z-10 aspect-square rounded-full blur-[200px] bg-accent-500/50 max-w-4xl -translate-y-1/2 w-[65%]" aria-hidden="true"></div>
+      <div class="container mx-auto relative">
+        <div class="mx-auto max-w-md text-center">
+          <h1 class="text-5xl !leading-[1.125] font-bold text-t-primary mb-4" data-dsr>
+            {{ properties.title | renderString }}
+          </h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto">
+      <div class="rounded-xl md:border-2 border-white/5 p-8 text-t-primary mb-16 lg:mb-32 editor" data-dsr>
+        {{ privacy_policy | safe }}
+      </div>
+    </div>
+  </div>
+</section>

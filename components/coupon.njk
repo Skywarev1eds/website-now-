@@ -1,0 +1,159 @@
+{% if global.components.coupon.enabled and (not global.components.coupon.homepage_only or templateName == 'shop') %}
+<div x-data="couponModal()" x-init="init()">
+  <div
+    x-show="showModal"
+    x-cloak
+    class="fixed inset-0 z-50 overflow-y-auto"
+    aria-labelledby="login-modal-title"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="flex items-center justify-center min-h-screen px-4 text-center">
+      <div 
+        x-show="showModal"
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        @click="closeModal()"
+        class="fixed inset-0 transition-opacity bg-black/75"
+        aria-hidden="true"
+      ></div>
+
+      <div
+        x-show="showModal" 
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        class="inline-block w-full max-w-md p-6 my-8 overflow-hidden relative text-center align-middle transition-all transform border-2 border-white/5 rounded-xl bg-background/75 backdrop-blur-lg text-t-primary"
+      >
+        <button @click="closeModal()" class="absolute top-4 right-4 text-t-primary focus:outline-none hover:text-accent-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"><path fill="currentColor" d="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275-.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></svg>
+        </button>
+
+        {% if global.components.coupon.show_logo or true %}
+          <div class="inline-flex items-center justify-center mb-2">
+            <img
+              src="{{ shop.image_url }}"
+              alt="{{ shop.name }}"
+              class="max-h-8"
+            />
+          </div>
+        {% endif %}
+
+        {% if global.components.coupon.headline %}
+          <div class="flex justify-center mt-4">
+            <span class="inline-block px-6 py-2 rounded-full border-2 border-white/5 bg-white/5 text-accent-100 text-sm font-semibold hover:translate-y-[-2px] transition-transform duration-300 ease-in-out">
+              {{ global.components.coupon.headline | renderString }}
+            </span>
+          </div>
+        {% endif %}
+    
+        {% if global.components.coupon.title %}
+          <h3 class="mt-4 text-xl font-bold text-t-primary font-heading">
+            {{ global.components.coupon.title | renderString }}
+          </h3>
+        {% endif %}
+
+        {% if global.components.coupon.description %}
+          <p class="mt-4 mx-auto max-w-xs text-sm text-t-primary/75 leading-relaxed text-center whitespace-pre-line">
+            {{ global.components.coupon.description | renderString }}
+          </p>
+        {% endif %}
+
+        <div class="mt-8 relative flex items-center gap-3 py-2 px-4 text-t-primary bg-white/5 border border-white/5 rounded-lg focus-within:border-accent-500 focus-within:ring-accent-500 focus-within:ring-2 focus-within:ring-opacity-50 focus-within:outline-none transition duration-300 ease-in-out">
+          <div class="flex-1">
+            <span class="block text-lg font-mono font-bold text-accent-500 tracking-wider text-center" x-text="couponCode"></span>
+          </div>
+          <button 
+            @click="copyCoupon()"
+            class="flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-semibold font-heading tracking-widest uppercase text-t-accent bg-accent-500 rounded-md hover:bg-accent-600 transition-colors duration-300 ease-in-out"
+          >
+            <span x-text="copyButtonText"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" x-show="!copied" class="size-3.5" viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="M9 18q-.825 0-1.412-.587T7 16V4q0-.825.588-1.412T9 2h9q.825 0 1.413.588T20 4v12q0 .825-.587 1.413T18 18zm-4 4q-.825 0-1.412-.587T3 20V7q0-.425.288-.712T4 6t.713.288T5 7v13h10q.425 0 .713.288T16 21t-.288.713T15 22z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" x-show="copied" class="size-3.5" viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m9.55 15.15l8.475-8.475q.3-.3.7-.3t.7.3t.3.713t-.3.712l-9.175 9.2q-.3.3-.7.3t-.7-.3L4.55 13q-.3-.3-.288-.712t.313-.713t.713-.3t.712.3z"/></svg>
+          </button>
+        </div>
+
+        <div class="mt-2 text-center">
+          <p class="text-xs text-t-primary/50 leading-relaxed">
+            {{ global.components.coupon.instructions }}
+          </p>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
+          <button
+            type="button"
+            @click="closeModal(true)"
+            class="inline-flex items-center justify-center gap-4 border-2 px-6 py-2 rounded-full font-semibold bg-accent-500 border-accent-500 text-t-accent hover:bg-accent-500/50 hover:text-t-primary transition-colors duration-300 ease-in-out"
+          >
+            {{ global.components.coupon.continue_button_text | renderString }}
+          </button>
+          <button
+            type="button"
+            @click="closeModal()"
+            class="inline-flex items-center justify-center gap-4 border-2 px-6 py-2 rounded-full font-semibold bg-white/5 border-white/5 text-t-primary hover:bg-white/10 hover:text-t-primary transition-colors duration-300 ease-in-out"
+          >
+            {{ global.components.coupon.dismiss_button_text | renderString }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('couponModal', () => ({
+      couponCode: '{{ global.components.coupon.coupon_code }}',
+      showAfter: {{ global.components.coupon.show_after_seconds * 1000 }},
+      forgetAfter: {{ global.components.coupon.forget_after_hours * 3600000 }},
+      showModal: false,
+      copied: false,
+      copyButtonText: 'Copy',
+      
+      init() {
+        const lastShown = localStorage.getItem(`coupon-${this.couponCode}-last-shown`);
+        const now = Date.now();
+        
+        if (!lastShown || (now - parseInt(lastShown)) > this.forgetAfter) {
+          setTimeout(() => {
+            this.showModal = true;
+          }, this.showAfter);
+        }
+      },
+      
+      closeModal(positive = false) {
+        this.showModal = false;
+        localStorage.setItem(`coupon-${this.couponCode}-last-shown`, Date.now().toString());
+
+        if (positive) {
+          const productsSection = document.querySelector('#products');
+          if (productsSection) {
+            productsSection.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            window.location.href = '/#products';
+          }
+        }
+      },
+      
+      copyCoupon() {
+        navigator.clipboard.writeText(this.couponCode).then(() => {
+          this.copied = true;
+          this.copyButtonText = 'Done';
+          
+          setTimeout(() => {
+            this.copied = false;
+            this.copyButtonText = 'Copy';
+          }, 2000);
+        })
+      }
+    }));
+  });
+</script>
+{% endif %}

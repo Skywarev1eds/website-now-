@@ -1,0 +1,621 @@
+<form @submit.prevent="buyNow">
+  <div class="p-6 rounded-xl border-2 bg-black/5 border-white/5 overflow-hidden text-t-primary backdrop-blur-2xl mb-8" data-dsr>
+    {% if product.variants.length > 1 %}
+      <div class="mb-4 pb-4 border-b border-y-white/5">
+        <label for="variant" class="block mb-2">Variant</label>
+        {% if properties.variant_selector == 'dropdown' or is_embed %}
+          <select name="variant" @change="() => activeVariant = $event.target.value" class="bg-white/5 text-t-primary rounded-lg py-2.5 px-4 w-full">
+            <template x-for="(variant, index) in product.variants" :key="index">
+              <option
+                :value="index"
+                :selected="activeVariant == index"
+                x-text="variant.name + ' (' + appCurrency.format(variant.price, product.currency) + ')'"
+              ></option>
+            </template>
+          </select>
+        {% else %}
+          <div class="flex flex-col gap-2">
+            {% for variant in product.variants %}
+              <button
+                type="button"
+                class="flex items-center justify-between gap-4 px-4 py-2 transition-colors duration-300 ease-in-out border text-t-primary rounded-lg bg-none border-transparent"
+                :class="`${activeVariant == {{ loop.index0 }} ? 'bg-white/5 border-white/5' : 'bg-none border-transparent'} ${({{ 'true' if variant.stock === 0 else 'false' }} || activeVariant == {{ loop.index0 }}) ? '' : 'hover:bg-white/5'}`"
+                @click="() => activeVariant = {{ loop.index0 }}"
+                {{ 'title="Out of Stock"' if variant.stock === 0 }}
+                {{ 'disabled' if variant.stock === 0 }}
+              >
+                <div class="flex-1 text-left">
+                  <p class="mb-0.5 text-base">{{ variant.name }}</p>
+                  {% if variant.description %}
+                    <p class="mb-0.5 text-xs text-t-primary/50">
+                      <span class="whitespace-pre-line">{{ variant.description }}</span>
+                    </p>
+                  {% endif %}
+                  <p class="text-xs text-t-primary/75">
+                    {% if variant.stock === 0 %}
+                      <span>Out of Stock</span>
+                    {% elif product.hide_stock_count %}
+                      <span>In Stock</span>
+                    {% elif variant.stock === -1 %}
+                      <span class="inline-flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="text-accent-500 size-4" fill="currentColor" viewBox="0 0 256 256"><path d="M248,128a56,56,0,0,1-95.6,39.6l-.33-.35L92.12,99.55a40,40,0,1,0,0,56.9l8.52-9.62a8,8,0,1,1,12,10.61l-8.69,9.81-.33.35a56,56,0,1,1,0-79.2l.33.35,59.95,67.7a40,40,0,1,0,0-56.9l-8.52,9.62a8,8,0,1,1-12-10.61l8.69-9.81.33-.35A56,56,0,0,1,248,128Z"></path></svg>
+                        In Stock
+                      </span>
+                    {% else %}
+                      <span>{{ variant.stock }} In Stock</span>
+                    {% endif %}
+                  </p>
+                </div>
+                <div>
+                  <span x-text="appCurrency.format({{ variant.price }}, '{{ product.currency }}')" class="font-medium">
+                    {{ formatPrice(variant.price, product.currency) }}
+                  </span>
+                  {% if variant.price_slash %}
+                    <span class="text-xs text-t-primary/50 line-through">
+                      <span x-text="appCurrency.format({{ variant.price_slash }}, '{{ product.currency }}')">
+                        {{ formatPrice(variant.price_slash, product.currency) }}
+                      </span>
+                    </span>
+                  {% endif %}
+                </div>
+              </button>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <small x-show="!(activeVariant in product.variants)" x-cloak class="text-red-500">
+          Please select a variant.
+        </small>
+      </div>
+    {% endif %}
+
+    <div class="mb-4 pb-4 border-b border-y-white/5">
+      <label for="quantity" class="block mb-2">Quantity</label>
+      <template x-if="variant && (minQuantity > 1 || maxQuantity)">
+        <small class="block text-t-primary/50 text-xs -mt-2 mb-2">
+          <template x-if="minQuantity > 1 && maxQuantity < 999999">
+            <span>
+              Minimum order: <span x-text="minQuantity"></span> - Maximum order: <span x-text="maxQuantity"></span>
+            </span>
+          </template>
+          <template x-if="minQuantity > 1 && !maxQuantity">
+            <span>
+              Minimum order: <span x-text="minQuantity"></span>
+            </span>
+          </template>
+          <template x-if="minQuantity <= 1 && maxQuantity < 999999">
+            <span>
+              Maximum order: <span x-text="maxQuantity"></span>
+            </span>
+          </template>
+        </small>
+      </template>
+      <div class="flex rounded-lg overflow-hidden focus-within:border-accent-500 focus-within:ring-accent-500 focus-within:ring-2 focus-within:ring-opacity-50">
+        <button
+          @click="changeQuantity(quantity - 1)"
+          type="button"
+          class="bg-white/10 hover:bg-accent-500 size-[41px] flex justify-center items-center transition-colors duration-300 ease-in-out disabled:pointer-events-none disabled:opacity-50"
+          :disabled="outOfStock || quantity <= minQuantity"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="currentColor" d="M6 13q-.425 0-.712-.288T5 12t.288-.712T6 11h12q.425 0 .713.288T19 12t-.288.713T18 13z"/></svg>
+        </button>
+        <input
+          type="number"
+          class="w-[calc(100%-82px)] bg-white/5 text-t-primary text-center focus:outline-none py-2 px-4 disabled:opacity-50 sm:text-left"
+          name="quantity"
+          x-model.number="quantity"
+          :disabled="outOfStock"
+        />
+        <button
+          @click="changeQuantity(quantity + 1)"
+          type="button"
+          class="bg-white/10 hover:bg-accent-500 size-[41px] flex justify-center items-center transition-colors duration-300 ease-in-out disabled:pointer-events-none disabled:opacity-50"
+          :disabled="outOfStock || quantity >= maxQuantity"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"/></svg>
+        </button>
+      </div>
+
+      <small
+        x-show="!outOfStock && (quantity < minQuantity || quantity > maxQuantity)"
+        x-cloak
+        class="text-red-500"
+      >
+        Please enter a valid quantity (from <span x-text="minQuantity"></span> to <span x-text="maxQuantity"></span>).
+      </small>
+
+      <div
+        x-show="availableVolumeDiscount"
+        class="transition-opacity"
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="opacity-0" 
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="opacity-100" 
+        x-transition:leave-end="opacity-0"
+      >
+        <div class="bg-white/5 text-t-primary/50 text-center text-sm rounded-lg p-1.5 mt-2 w-full">
+          Buy <span x-text="(availableVolumeDiscount?.quantity - quantity) || 0"></span> more to get a <span x-text="(availableVolumeDiscount?.percentage) || 0"></span>% discount.
+        </div>
+      </div>
+    </div>
+
+    {% if productAddons and productAddons.length > 0 %}
+      <div class="mb-4 pb-4 border-b border-white/5">
+        <label class="block mb-2">Addons</label>
+        <div class="flex flex-col gap-2">
+          {% for addon in productAddons %}
+            <div class="flex items-center justify-between gap-4 px-4 py-2 transition-colors duration-300 ease-in-out border text-t-primary rounded-lg bg-white/5 border-white/5">
+              <div class="flex-1 flex items-center gap-2 text-left">
+                {% if addon.image_urls and addon.image_urls[0] %}
+                  <img 
+                    src="{{ addon.image_urls[0] }}" 
+                    alt="{{ addon.name }}"
+                    class="-ml-2 size-12 rounded-md object-cover border border-white/5"
+                  >
+                {% endif %}
+                <div>
+                  <p class="mb-0.5 text-base">{{ addon.name }}</p>
+                  {% if addon.description %}
+                    <p class="mb-0.5 text-xs text-t-primary/50">
+                      <span class="whitespace-pre-line">{{ addon.description }}</span>
+                    </p>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <span x-text="appCurrency.format('{{ addon.variants[0].price }}', '{{ addon.currency }}')" class="font-medium">
+                  {{ formatPrice(addon.variants[0].price, addon.currency) }}
+                </span>
+                <button
+                  type="button"
+                  x-show="!appCart.isInCart({{ addon.variants[0].id }}, variant.id)"
+                  x-on:click="appCart.add({{ addon.id }}, {{ addon.variants[0].id }}, 1, variant.id)"
+                  class="min-w-28 px-4 py-1 rounded-lg flex justify-center items-center gap-1 border text-sm font-medium bg-accent-500/10 border-accent-500/10 text-accent-500 hover:enabled:border-accent-500 hover:enabled:bg-accent-500/20 transition-colors duration-300 ease-in-out disabled:opacity-50 disabled:pointer-events-none"
+                  :disabled="outOfStock || product.visibility == 'on_hold' || cartLimitReached || addingToCart"
+                >
+                  <span>Add</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"/></svg>
+                </button>
+                {% if addon.is_mandatory %}
+                  <button
+                    type="button"
+                    x-show="appCart.isInCart({{ addon.variants[0].id }}, variant.id)"
+                    class="min-w-28 px-4 py-1 rounded-lg flex justify-center items-center gap-1 border text-sm font-medium bg-accent-500/10 border-accent-500/10 text-accent-500"
+                    disabled
+                    title="This addon is mandatory"
+                  >
+                    <span>Added</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m9.55 15.15l8.475-8.475q.3-.3.7-.3t.7.3t.3.713t-.3.712l-9.175 9.2q-.3.3-.7.3t-.7-.3L4.55 13q-.3-.3-.288-.712t.313-.713t.713-.3t.712.3z"/></svg>
+                  </button>
+                {% else %}
+                  <button
+                    type="button"
+                    x-show="appCart.isInCart({{ addon.variants[0].id }}, variant.id)"
+                    x-on:click="appCart.remove({{ addon.variants[0].id }}, variant.id)"
+                    class="min-w-28 px-4 py-1 rounded-lg flex justify-center items-center gap-1 border text-sm font-medium bg-red-500/10 border-red-500/10 text-red-500 hover:enabled:border-red-500 hover:enabled:bg-red-500/20 transition-colors duration-300 ease-in-out disabled:opacity-50 disabled:pointer-events-none"
+                    :disabled="outOfStock || product.visibility == 'on_hold' || cartLimitReached || addingToCart"
+                  >
+                    <span>Remove</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275-.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></svg>
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if altcha and not properties.hide_buy_now %}
+      <div
+        x-cloak
+        x-show="!altchaPayload"
+        class="transition-opacity"
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+      >
+        <altcha-widget
+          challengejson='{{ altcha | json }}'
+          auto="onload"
+          hidefooter="true"
+          hidelogo="true"
+          x-ref="altcha"
+        ></altcha-widget>
+      </div>
+    {% endif %}
+
+    <div
+      x-cloak
+      x-show="buyNowError"
+      class="transition-opacity"
+      x-transition:enter="transition ease-out duration-300 transform"
+      x-transition:enter-start="opacity-0" 
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="opacity-100" 
+      x-transition:leave-end="opacity-0"
+    >
+      <div class="bg-red-500 border-2 border-white/5 text-t-primary p-4 rounded-lg mt-4">
+        <span x-text="buyNowError"></span>
+      </div>
+    </div>
+    
+    <div class="flex flex-col gap-4 mt-4 lg:flex-row">
+      {% if not properties.hide_add_to_cart %}
+        <button
+          type="button"
+          x-on:click="addToCart"
+          class="px-6 py-2 rounded-full flex-1 flex justify-center items-center border-2 font-semibold bg-accent-500 border-accent-500 text-t-accent hover:enabled:bg-accent-500/50 hover:enabled:text-t-primary transition-colors duration-300 ease-in-out disabled:opacity-50 disabled:pointer-events-none"
+          :disabled="outOfStock || product.visibility == 'on_hold' || cartLimitReached || addingToCart"
+        >
+          <template x-if="!addingToCart && !addedToCart">
+            <span class="inline-flex justify-center items-center gap-2">
+              <span x-text="cartLimitReached ? 'Cart Limit Reached' : 'Add to Cart'"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="currentColor" d="M11 6H9q-.425 0-.712-.288T8 5t.288-.712T9 4h2V2q0-.425.288-.712T12 1t.713.288T13 2v2h2q.425 0 .713.288T16 5t-.288.713T15 6h-2v2q0 .425-.288.713T12 9t-.712-.288T11 8zM7 22q-.825 0-1.412-.587T5 20t.588-1.412T7 18t1.413.588T9 20t-.587 1.413T7 22m10 0q-.825 0-1.412-.587T15 20t.588-1.412T17 18t1.413.588T19 20t-.587 1.413T17 22M3 4H2q-.425 0-.712-.288T1 3t.288-.712T2 2h1.65q.275 0 .525.15t.375.425L8.525 11h7l3.625-6.5q.125-.25.35-.375T20 4q.575 0 .863.488t.012.987L17.3 11.95q-.275.5-.737.775T15.55 13H8.1L7 15h11q.425 0 .713.288T19 16t-.288.713T18 17H7q-1.125 0-1.713-.975T5.25 14.05L6.6 11.6z"/></svg>
+            </span>
+          </template>
+          <template x-if="addingToCart">
+            <span class="inline-flex justify-center items-center gap-2">
+              <span>Adding...&nbsp;&nbsp;</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-dasharray="16" stroke-dashoffset="16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.97 0 9 4.03 9 9"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.2s" values="16;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></svg>
+            </span>
+          </template>
+          <template x-if="addedToCart">
+            <span class="inline-flex justify-center items-center gap-2">
+              <span>Go to Cart</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="currentColor" d="M7 22q-.825 0-1.412-.587T5 20t.588-1.412T7 18t1.413.588T9 20t-.587 1.413T7 22m10 0q-.825 0-1.412-.587T15 20t.588-1.412T17 18t1.413.588T19 20t-.587 1.413T17 22M6.15 6l2.4 5h7l2.75-5zM5.2 4h14.75q.575 0 .875.513t.025 1.037l-3.55 6.4q-.275.5-.737.775T15.55 13H8.1L7 15h11q.425 0 .713.288T19 16t-.288.713T18 17H7q-1.125 0-1.7-.987t-.05-1.963L6.6 11.6L3 4H2q-.425 0-.712-.288T1 3t.288-.712T2 2h1.625q.275 0 .525.15t.375.425zm3.35 7h7z"/></svg>
+            </span>
+          </template>
+        </button>
+      {% endif %}
+      {% if not properties.hide_buy_now %}
+        <button
+          type="submit"
+          class="px-6 py-2 rounded-full flex-1 flex justify-center items-center gap-2 border-2 font-semibold bg-white/5 border-accent-500/10 text-t-primary hover:enabled:border-accent-500 hover:enabled:bg-accent-500/10 transition-colors duration-300 ease-in-out disabled:opacity-50 disabled:pointer-events-none"
+          :disabled="outOfStock || product.visibility == 'on_hold' || buyingNow || buyNowDisabled"
+        >
+          <span>Buy Now</span>
+          <template x-if="!buyingNow">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"><path fill="currentColor" d="M9.575 12L5.7 8.1q-.275-.275-.288-.687T5.7 6.7q.275-.275.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.687.288T5.7 17.3q-.275-.275-.275-.7t.275-.7zm6.6 0L12.3 8.1q-.275-.275-.288-.687T12.3 6.7q.275-.275.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.687.288T12.3 17.3q-.275-.275-.275-.7t.275-.7z"/></svg>
+          </template>
+          <template x-if="buyingNow">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-dasharray="16" stroke-dashoffset="16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.97 0 9 4.03 9 9"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.2s" values="16;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></svg>
+          </template>
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</form>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('productForm', () => ({
+      product: {{ product | json }},
+      productAddons: {{ productAddons | json }},
+      activeVariant: 0,
+      quantity: {{ product.quantity_min or 1 }},
+      isEmbed: {{ 'true' if is_embed else 'false' }},
+      addingToCart: false,
+      addedToCart: false,
+      buyingNow: false,
+      buyNowError: null,
+      buyNowDisabled: false,
+      altchaPayload: null,
+
+      get variant() {
+        return this.product.variants[this.activeVariant];
+      },
+
+      init: function () {
+        // Choose the first variant that has stock.
+        for (let i = 0; i < this.product.variants.length; i++) {
+          if (this.product.variants[i].stock !== 0) {
+            this.activeVariant = i;
+            break;
+          }
+        }
+
+        if (!this.activeVariant) {
+          this.activeVariant = 0;
+        }
+
+        if (this.variant.quantity_min) {
+          this.quantity = this.variant.quantity_min;
+        }
+
+        this.$watch('activeVariant', () => {
+          this.quantity = this.product.quantity_min || 1;
+
+          if (this.variant.quantity_min) {
+            this.quantity = this.variant.quantity_min;
+          }
+
+          this.addedToCart = false;
+        });
+
+        this.$watch('quantity', () => {
+          this.addedToCart = false;
+        });
+
+        // Automatically add mandatory addons to cart.
+        for (const addon of this.productAddons) {
+          if (addon.is_mandatory) {
+            if (!this.appCart.isInCart(addon.variants[0].id, this.variant.id)) {
+              this.appCart.add(addon.id, addon.variants[0].id, 1, this.variant.id);
+            }
+          }
+        }
+
+        const that = this;
+
+        // Prefill info from query params.
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.has('quantity')) {
+          this.quantity = parseInt(urlParams.get('quantity'));
+        }
+
+        if (urlParams.has('variant')) {
+          const variantIndex = this.product.variants.findIndex(variant => variant.name === urlParams.get('variant'));
+          if (variantIndex !== -1) {
+            this.activeVariant = variantIndex;
+          }
+        }
+
+        {% if altcha and not properties.hide_buy_now %}
+          this.addAltchaEventListener();
+        {% endif %}
+      },
+
+      get availableVolumeDiscount() {
+        if (this.variant.volume_discounts) {
+          const volumeDiscounts = this.variant.volume_discounts.sort((a, b) => a.quantity - b.quantity);
+
+          for (const volumeDiscount of volumeDiscounts) {
+            if (this.quantity < parseInt(volumeDiscount.quantity)) {
+              return volumeDiscount;
+            }
+          }
+        }
+
+        return null;
+      },
+
+      get totalPrice() {
+        let price = this.variant.price * this.quantity;
+        let priceBeforeDiscounts = price;
+
+        // Apply volume discounts
+        if (this.variant.volume_discounts) {
+          const volumeDiscounts = this.variant.volume_discounts.sort((a, b) => b.quantity - a.quantity);
+
+          for (const volumeDiscount of volumeDiscounts) {
+            if (this.quantity >= parseInt(volumeDiscount.quantity)) {
+              price = price - (priceBeforeDiscounts * parseInt(volumeDiscount.percentage) / 100);
+              break;
+            }
+          }
+        }
+
+        // Append prices of addons
+        if (this.appCart.items.length > 0) {
+          for (const item of this.appCart.items) {
+            if (item.parentVariantId === this.variant.id) {
+              const addonVariant = this.productAddons.find(addon => addon.id === item.productId && addon.variants.some(variant => variant.id === item.variantId));
+              if (addonVariant) {
+                const addonPrice = addonVariant.variants.find(variant => variant.id === item.variantId).price;
+                price += addonPrice * item.quantity;
+              }
+            }
+          }
+        }
+
+        // If price is negative, set it to 0
+        if (price < 0) {
+          price = 0;
+        }
+
+        // Format the price to have 2 decimal places
+        const formattedPrice = price.toFixed(2);
+
+        return formattedPrice;
+      },
+
+      get outOfStock() {
+        if (this.variant) {
+          if (this.variant.stock === 0) {
+            return true;
+          }
+
+          if (this.variant.quantity_min > 0 && this.variant.stock !== -1 && !this.product.hide_stock_count && this.variant.stock < this.variant.quantity_min) {
+            return true;
+          }
+        }
+
+        return false;
+      },
+
+      get minQuantity() {
+        const min = this.variant.quantity_min || 1;
+
+        if (this.variant.stock === 0) {
+          return 0;
+        }
+
+        return min;
+      },
+
+      get maxQuantity() {
+        const max = this.variant.quantity_max || 999999;
+
+        if (this.variant.stock === 0) {
+          return 0;
+        }
+
+        if (this.product.hide_stock_count) {
+          return max;
+        }
+
+        if (this.variant.stock === -1) {
+          return max;
+        }
+
+        return Math.min(max, this.variant.stock);
+      },
+
+      changeQuantity: function (quantity) {
+        const min = this.minQuantity;
+        const max = this.maxQuantity;
+        const newQuantity = Math.min(Math.max(min, quantity), max);
+
+        this.quantity = newQuantity;
+      },
+
+      get cartLimitReached() {
+        return this.appCart.items.length >= {{ shop.max_cart_limit }};
+      },
+
+      addToCart: function () {
+        if (this.addedToCart) {
+          window.location.href = '{{ '/cart' | shopUrl }}';
+          return;
+        }
+
+        this.addingToCart = true;
+
+        const productId = this.product.id;
+        const variantId = this.variant.id;
+        const quantity = this.quantity;
+
+        this.appCart.add(productId, variantId, quantity);
+
+        setTimeout(() => {
+          this.addedToCart = true;
+          this.addingToCart = false;
+        }, 1000);
+      },
+
+      addAltchaEventListener: function () {
+        this.$refs.altcha.addEventListener('statechange', (event) => {
+          if (event.detail.state === 'verifying') {
+            this.buyNowDisabled = true;
+          } else if (event.detail.state === 'verified') {
+            this.buyNowDisabled = false;
+            this.altchaPayload = event.detail.payload;
+          }
+        });
+      },
+
+      generateRecaptchaToken: async function () {
+        return new Promise((resolve) => {
+          grecaptcha.ready(
+            () =>
+              void (async () => {
+                const token = await grecaptcha.execute(
+                  '{{ shop.recaptcha_key }}',
+                  { action: 'buynow_s{{ shop.id }}' },
+                );
+
+                resolve(token);
+              })(),
+          );
+        });
+      },
+
+      buyNow: async function () {
+        if (this.buyingNow) {
+          return;
+        }
+
+        const buyNowCart = [{
+          productId: this.product.id,
+          variantId: this.variant.id,
+          quantity: this.quantity,
+        }];
+
+        if (this.appCart.items.length > 0) {
+          for (const item of this.appCart.items) {
+            if (item.parentVariantId === this.variant.id) {
+              buyNowCart.push({
+                productId: item.productId,
+                variantId: item.variantId,
+                parentVariantId: item.parentVariantId,
+                quantity: item.quantity,
+              });
+            }
+          }
+        }
+
+        const formData = {
+          cart: buyNowCart,
+          currency: this.appCurrency.currency,
+          shopId: '{{ shop.id }}',
+        };
+
+        if (window.shopCustomer?.email) {
+          formData.email = window.shopCustomer.email;
+        }
+
+        {% if altcha %}
+          if (this.altchaPayload) {
+            formData.altcha = this.altchaPayload;
+          }
+        {% elif shop.recaptcha_key %}
+          try {
+            formData.recaptchaToken = await this.generateRecaptchaToken();
+          } catch (error) {
+            this.buyNowError = 'reCAPTCHA cannot be loaded. Please refresh the page and turn off any ad blockers.';
+            this.buyingNow = false;
+            return;
+          }
+        {% endif %}
+
+        try {
+          this.buyingNow = true;
+
+          const response = await fetch('{{ '/v1/checkout' | apiInternalUrl }}', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          });
+
+          const responseData = await response.json();
+
+          if (responseData.url) {
+            this.checkoutUrl = responseData.url;
+
+            // Open in new tab if we're in an embed.
+            if (this.isEmbed) {
+              window.open(this.checkoutUrl, '_blank');
+              this.isLoadingModalOpen = true;
+            } else {
+              window.location.href = this.checkoutUrl;
+            }
+          } else {
+            this.buyingNow = false;
+            this.buyNowError = responseData?.message || 'Error in the AJAX request.';
+          }
+        } catch (error) {
+          console.error(error);
+          this.buyingNow = false;
+          this.buyNowError = 'Unexpected error. Please refresh the page and try again.';
+        }
+      }
+    }));
+  });
+</script>
+
+<script>
+  window.addEventListener('load', () => {
+    if (document.querySelector('select[name="variant"]')) {
+     new Choices('select[name="variant"]', { searchPlaceholderValue: 'Search for a variant...', shouldSort: false });
+    }
+  });
+</script>

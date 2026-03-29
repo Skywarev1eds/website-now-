@@ -1,0 +1,94 @@
+<style>
+  .feedback-section-wrapper {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--cl-background-primary);
+  }
+
+  /* Leuchteffekte, angepasst an Theme-Farben */
+  .feedback-glow {
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--cl-accent) 15%, transparent) 0%, transparent 60%);
+    pointer-events: none;
+    filter: blur(40px);
+  }
+  .feedback-glow.left { left: -300px; }
+  .feedback-glow.right { right: -300px; }
+
+  .feedback-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  /* Marquee Laufband-Logik */
+  .marquee-container {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  }
+
+  .marquee-wrapper { display: flex; overflow: hidden; }
+  .marquee-track {
+    display: flex;
+    flex-shrink: 0;
+    gap: 1.5rem; /* Etwas mehr Abstand */
+    animation: marquee 120s linear infinite;
+    will-change: transform;
+  }
+  .marquee-track.reverse { animation-name: marquee-reverse; }
+  .marquee-wrapper:hover .marquee-track { animation-play-state: paused; }
+  .marquee-content { display: flex; flex-shrink: 0; gap: 1.5rem; }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes marquee-reverse {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
+  }
+</style>
+
+<section class="feedback-section-wrapper component" data-component-id="{{ componentId }}">
+  <div class="feedback-glow left"></div>
+  <div class="feedback-glow right"></div>
+
+  <div class="feedback-container">
+    <div class="section-header text-center mb-5">
+      {% if properties.title %}<div class="section-title"><h2 style="font-size: 2.5rem; font-weight: 700; color: var(--cl-heading);">{{ properties.title | renderString }}</h2></div>{% endif %}
+      {% if properties.subtitle %}<div class="section-subtitle"><p style="color: var(--cl-text-muted); max-width: 600px; margin: 0.5rem auto 0;">{{ properties.subtitle | renderString }}</p></div>{% endif %}
+    </div>
+
+    <div class="marquee-container mt-5">
+      {% if feedbacks and feedbacks.length > 0 %}
+        {% set half_length = (feedbacks.length / 2) | round(0, 'ceil') %}
+        {% set first_half_feedbacks = feedbacks.slice(0, half_length) %}
+        {% set second_half_feedbacks = feedbacks.slice(half_length) %}
+
+        <!-- Erste Reihe -->
+        <div class="marquee-wrapper mb-4">
+          <div class="marquee-track">
+            {% for i in range(0, 2) %}<div class="marquee-content">
+              {% for feedback in first_half_feedbacks %}{% render_snippet "feedback-card.njk", feedback=feedback %}{% endfor %}
+            </div>{% endfor %}
+          </div>
+        </div>
+
+        <!-- Zweite Reihe -->
+        <div class="marquee-wrapper">
+          <div class="marquee-track reverse">
+            {% for i in range(0, 2) %}<div class="marquee-content">
+              {% for feedback in second_half_feedbacks %}{% render_snippet "feedback-card.njk", feedback=feedback %}{% endfor %}
+            </div>{% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

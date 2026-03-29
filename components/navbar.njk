@@ -1,0 +1,278 @@
+<style>
+  :root {
+    --nav-bg-color: rgba(20, 20, 20, 0.7);
+    --nav-blur: 18px;
+    --nav-text-color: #e5e7eb;
+    --nav-border-color: rgba(255, 255, 255, 0.1);
+    --nav-glow-color: color-mix(in srgb, var(--cl-accent) 25%, transparent);
+    --nav-hover-bg: rgba(255, 255, 255, 0.07);
+    --nav-primary-accent: var(--cl-accent);
+    --nav-primary-accent-hover: color-mix(in srgb, var(--cl-accent), black 15%);
+    --nav-font: 'Poppins', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { padding-top: 80px; }
+  [id] { scroll-margin-top: 90px; }
+
+  .modern-navbar {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 1320px;
+    z-index: 1000;
+    background: var(--nav-bg-color);
+    backdrop-filter: blur(var(--nav-blur));
+    -webkit-backdrop-filter: blur(var(--nav-blur));
+    border: 1px solid var(--nav-border-color);
+    font-family: var(--nav-font);
+    padding: 0.4rem 1.5rem;
+    border-radius: 99px;
+    box-shadow: 0 0 3px var(--nav-glow-color);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+    transform: translateY(-20px) translateX(-50%);
+    animation: fadeInDown 0.6s 0.2s ease-out forwards;
+  }
+  
+  @keyframes fadeInDown {
+    to {
+      opacity: 1;
+      transform: translateY(0) translateX(-50%);
+    }
+  }
+
+  .modern-navbar.navbar-hidden {
+    transform: translateY(-120%) translateX(-50%);
+  }
+
+  .navbar-container {
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+    margin-right: 1.5rem;
+  }
+  .navbar-logo img {
+    height: 1.8rem;
+    object-fit: contain;
+  }
+
+  .nav-links-desktop {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .nav-link {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 99px;
+    color: var(--nav-text-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    z-index: 1;
+  }
+  
+  .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.7s ease;
+    z-index: -1;
+  }
+
+  .nav-link:hover::before { left: 100%; }
+  .nav-link:hover { color: #fff; background-color: var(--nav-hover-bg); }
+  
+  .nav-link.active {
+    background-color: var(--nav-primary-accent);
+    color: white;
+    font-weight: 700;
+  }
+  .nav-link.active:hover { background-color: var(--nav-primary-accent-hover); }
+
+  .nav-link-divider {
+    width: 1px;
+    height: 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 0.75rem;
+  }
+
+  .actions-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-left: 0.75rem;
+  }
+
+  .action-button {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+  }
+  .action-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  
+  .nav-toggle-btn, #mobile-menu-container { display: none; }
+
+  @media (max-width: 992px) {
+    .nav-links-desktop, .actions-container { display: none; }
+    .nav-toggle-btn {
+      display: block;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+    .modern-navbar {
+        width: calc(100% - 2rem);
+        left: 1rem;
+        transform: translateX(0);
+        animation: fadeInDown 0.6s 0.2s ease-out forwards;
+    }
+    @keyframes fadeInDown {
+      to {
+        opacity: 1;
+        transform: translateY(0) translateX(0);
+      }
+    }
+    .modern-navbar.navbar-hidden {
+        transform: translateY(-120%) translateX(0);
+    }
+    #mobile-menu-container {
+      flex-direction: column;
+      gap: 0.8rem;
+      padding: 1rem;
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      right: 0;
+      background: var(--nav-bg-color);
+      border: 1px solid var(--nav-border-color);
+      border-radius: 1rem;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    #mobile-menu-container.show { display: flex; }
+    .modern-navbar.is-open {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+  }
+</style>
+
+<nav class="modern-navbar component" data-component-id="navbar">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <a href="{{ '/' | shopUrl }}" class="navbar-logo">
+      <img src="https://i.ibb.co/0V8tqcYT/logo.png" alt="Skyware Logo" />
+    </a>
+
+    <!-- Desktop Navigation -->
+    <div class="nav-links-desktop">
+      {% for link in global.components.navbar.left_links %}
+        <a href="{{ link.link | shopUrl }}" class="nav-link {% if request.path == link.link or (link.link == '/#products' and request.path == '/') %}active{% endif %}" target="{{ 'blank' if link.new_tab }}">
+          {{ link.text }}
+        </a>
+        {% if not loop.last %}
+          <div class="nav-link-divider"></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Right Actions (Desktop) -->
+    <div class="actions-container">
+      <div class="nav-link-divider"></div>
+      {% if shop_customer %}
+        <a href="{{ '/customer/dashboard' | shopUrl }}" class="nav-link">
+          <i class="fa fa-user"></i> Dashboard
+        </a>
+      {% else %}
+        <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#customer-login-modal">
+          <i class="fa-solid fa-right-to-bracket"></i> Login
+        </a>
+      {% endif %}
+
+      {% if not global.components.navbar.hide_cart %}
+        <a href="{{ '/cart' | shopUrl }}" class="nav-link">
+          <i class="fa fa-shopping-cart"></i> Cart
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <button class="nav-toggle-btn" id="menuToggle" aria-label="Toggle menu">☰</button>
+    
+    <!-- Mobile Menu (collapsible) -->
+    <div id="mobile-menu-container">
+      {% for link in global.components.navbar.left_links %}
+      <a href="{{ link.link | shopUrl }}" class="nav-link {% if request.path == link.link %}active{% endif %}" target="{{ 'blank' if link.new_tab }}">
+        {{ link.text }}
+      </a>
+      {% endfor %}
+
+      <hr style="border-color: rgba(255,255,255,0.1);">
+
+      {% if shop_customer %}
+      <a href="{{ '/customer/dashboard' | shopUrl }}" class="nav-link"><i class="fa fa-user"></i> Dashboard</a>
+      {% else %}
+      <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#customer-login-modal"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+      {% endif %}
+
+      {% if not global.components.navbar.hide_cart %}
+      <a href="{{ '/cart' | shopUrl }}" class="nav-link"><i class="fa fa-shopping-cart"></i> Cart</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+{% raw %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const navbar = document.querySelector('.modern-navbar');
+    const toggleButton = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobile-menu-container');
+
+    if (toggleButton && mobileMenu) {
+      toggleButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        mobileMenu.classList.toggle('show');
+        navbar.classList.toggle('is-open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!navbar.contains(e.target) && mobileMenu.classList.contains('show')) {
+          mobileMenu.classList.remove('show');
+          navbar.classList.remove('is-open');
+        }
+      });
+    }
+  });
+</script>
+{% endraw %}

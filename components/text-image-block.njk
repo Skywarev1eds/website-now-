@@ -1,0 +1,82 @@
+{% set titleAlignClassMap = {
+  'left': '',
+  'center': 'items-center text-center',
+  'right': 'items-end text-right'
+} %}
+
+{% set contentAlignClassMap = {
+  'left': 'flex-col lg:flex-row',
+  'center': 'flex-col items-center',
+  'right': 'flex-col lg:flex-row-reverse'
+} %}
+
+{% set textAlignClassMap = {
+  'left': 'text-left',
+  'center': 'text-center',
+  'right': 'text-right'
+} %}
+
+{% set buttonAlignClassMap = {
+  'left': 'justify-start',
+  'center': 'justify-center',
+  'right': 'justify-end'
+} %}
+
+{% set imageAspectClassMap = {
+  'Default': '',
+  '1/1': 'aspect-square',
+  '4/3': 'aspect-[4/3]',
+  '16/9': 'aspect-video'
+} %}
+
+{% set titleAlignClass = titleAlignClassMap[properties.title_alignment] %}
+{% set contentAlignClassMap = contentAlignClassMap[properties.content_alignment] %}
+{% set textAlignClass = textAlignClassMap[properties.content_alignment] %}
+{% set buttonAlignClass = buttonAlignClassMap[properties.content_alignment] %}
+{% set imageAspectClass = imageAspectClassMap[properties.aspect_ratio] %}
+
+{% set backgroundClass = 'p-8 rounded-xl border-2 border-white/5 bg-black/5 backdrop-blur-2xl lg:p-16' if properties.show_background else '' %}
+
+<section id="{{ componentId }}" class="component" data-component-id="{{ componentId }}">
+  <div class="container mx-auto px-4 mb-16 lg:mb-32">
+    {% if properties.headline or properties.title or properties.subtitle %}
+    <div class="flex flex-col gap-4 mb-8 {{ titleAlignClass }}">
+      {% if properties.headline %}
+      <div>
+        <span class="inline-block px-6 py-2 rounded-full border-2 border-white/5 bg-white/5 text-accent-100 text-sm font-semibold hover:translate-y-[-2px] transition-transform duration-300 ease-in-out" data-dsr>
+          {{ properties.headline | renderString }}
+        </span>
+      </div>
+      {% endif %}
+      {% if properties.title %}
+      <h2 class="text-5xl !leading-[1.125] font-bold text-t-primary" data-dsr>
+        {{ properties.title | renderString }}
+      </h2>
+      {% endif %}
+      {% if properties.subtitle %}
+      <p class="text-base text-t-primary/50" data-dsr>
+        {{ properties.subtitle | renderString }}
+      </p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="{{ backgroundClass }}" data-dsr>
+      <div class="flex gap-8 {{ contentAlignClassMap }}">
+        <div class="flex flex-col gap-8 max-w-5xl {{ textAlignClass }}">
+          <p class="text-base text-t-primary/50" data-dsr>
+            <span class="whitespace-pre-line">{{ properties.text | renderString }}</span>
+          </p>
+          {% if properties.buttons and properties.buttons.length > 0 %}
+          <div class="flex flex-wrap items-center gap-4 {{ buttonAlignClass }}" data-dsr>
+            {% render_snippet "buttons.njk", buttons=properties.buttons %}
+          </div>
+          {% endif %}
+        </div>
+        <div>
+          <img src="{{ properties.image | imageUrl }}" alt="" class="w-full {{ imageAspectClass }} object-scale-down rounded-xl zoomable" loading="lazy" data-dsr>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

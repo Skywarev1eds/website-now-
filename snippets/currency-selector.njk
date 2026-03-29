@@ -1,0 +1,7 @@
+<div class="currency-selector">
+  <select name="currency" id="currency-select" class="form-select">
+    {% for currency_code in shop.currencies %}
+      <option value="{{ currency_code }}" {% if currency_code == currency %}selected{% endif %}>{{ currency_code }}</option>
+    {% endfor %}
+  </select>
+</div>

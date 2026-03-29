@@ -1,0 +1,9 @@
+{% if shop_customer %}
+    <a href="/customer/dashboard" class="icon-link">
+        <i class="fa-solid fa-user"></i>
+    </a>
+{% else %}
+    <a href="#" data-bs-toggle="modal" data-bs-target="#customer-login-modal" class="icon-link">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+    </a>
+{% endif %}

@@ -1,0 +1,376 @@
+{#
+  Product Page - V33 (Final Layout Polish)
+  - Redesigned the purchase box to eliminate all empty space for a compact, professional look.
+  - Added a new "Satisfaction Guarantee" block to build more trust.
+  - Unified the sections within the purchase box for a more cohesive design.
+  - FIXED: quantity input is now editable (you can type numbers) and price updates dynamically with quantity.
+#}
+
+<section class="component product-wrapper-v33" data-component-id="product-page" x-data="productFormV29">
+  <div class="container py-5">
+    
+    <div class="row">
+      <!-- Left Column: Image & Description -->
+      <div class="col-lg-8">
+        <!-- Main Product Card -->
+        <div class="main-product-card-v33">
+          <div class="product-grid-v33">
+            <!-- Image -->
+            <div class="product-image-container-v33">
+              {% if product.image_urls|length > 0 %}
+                <img src="{{ product.image_urls[0] }}" alt="{{ product.name }}">
+              {% elif product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+              {% else %}
+                <div class="image-placeholder-v33">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" viewBox="0 0 16 16"><path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z"/></svg>
+                </div>
+              {% endif %}
+            </div>
+            
+            <!-- Info -->
+            <div class="product-info-v33">
+              <h1 class="product-title-v33">{{ product.name }}</h1>
+              
+              <div class="status-tags-v33">
+                {% if product.status_text %}
+                  {% set status_lower = product.status_text|lower|replace(' ', '-') %}
+                  {% set status_color = 'gray' %}
+                  {% if 'undetected' in status_lower %}{% set status_color = 'green' %}
+                  {% elif 'testing' in status_lower %}{% set status_color = 'yellow' %}
+                  {% elif 'updating' in status_lower %}{% set status_color = 'blue' %}
+                  {% elif 'detected' in status_lower %}{% set status_color = 'red' %}
+                  {% elif 'frozen' in status_lower %}{% set status_color = 'gray' %}
+                  {% elif 'high-risk' in status_lower %}{% set status_color = 'purple' %} {# NEU #}
+                  {% endif %}
+                  <span class="status-tag-v33 {{ status_color }}">
+                    <span class="dot"><span class="pulsating"></span></span>
+                    {{ product.status_text }}
+                  </span>
+                {% endif %}
+                 <span class="status-tag-v33 green"><span class="dot"><span class="pulsating"></span></span>Instant Delivery</span>
+              </div>
+    
+              <!-- Payment Callout Block -->
+              <div class="payment-callout-v33">
+                <div class="callout-icon-v33"><i class="fa-solid fa-credit-card"></i></div>
+                <div class="callout-content-v33">
+                  <h3 class="callout-title-v33">Need a different payment method?</h3>
+                  <p class="callout-text-v33">Our support team can help with alternative options.</p>
+                </div>
+                <a href="{{ shop.discord_url or '#' }}" target="_blank" class="callout-button-v33">
+                  <i class="fab fa-discord"></i> Contact
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description Section -->
+        <div class="features-section-v33">
+          <div class="feature-header-v33">
+            <i class="fas fa-file-alt"></i>
+            <span>Description & Features</span>
+          </div>
+          <div class="feature-content-v33 editor">
+            {{ product.description | safe }}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column: Purchase -->
+      <div class="col-lg-4">
+        <div class="purchase-box-v33">
+          <form>
+            <h3 class="purchase-title-v33">Select Subscription</h3>
+            <div class="variant-selector-v33">
+              {% for variant in product.variants %}
+                <div 
+                  class="variant-option-v33" 
+                  :class="{ 'active': activeVariant == {{ loop.index0 }}, 'disabled': {{ 'true' if variant.stock == 0 else 'false' }} }"
+                  @click="selectVariant({{ loop.index0 }})"
+                >
+                  <div class="variant-info-v33">
+                    <span class="name">{{ variant.name }}
+                    </span>
+                    <span class="stock-info-v33" :class="{'in-stock': {{ variant.stock != 0 if variant.stock is defined else 'true' }}, 'out-of-stock': {{ variant.stock == 0 if variant.stock is defined else 'false' }} }">
+                       {{ 'In Stock' if variant.stock != 0 else 'Out of Stock' }}
+                       {% set words = variant.name.split(' ') %}
+                       {% if words | length == 3 and words[1] == 'Day' and words[2] == 'Subscription' %}
+                         {% set divisor = words[0] | int(0) %}
+                         {% if divisor > 0 %}
+                           {% set daily_price = variant.price / divisor %}
+                           <span class="daily-price" x-data x-text="'• ' + app.appCurrency.format({{ daily_price }}, '{{ product.currency }}') + '/day'"></span>
+                         {% endif %}
+                       {% endif %}
+                    </span>
+                  </div>
+                  <span class="price">
+                    <!-- unit price -->
+                    <span x-text="appCurrency.format({{ variant.price }}, '{{ product.currency }}')"></span>
+                  </span>
+                </div>
+              {% endfor %}
+            </div>
+  
+            <h3 class="purchase-title-v33 mt-4">Quantity</h3>
+            <div class="quantity-input-v33">
+              <button @click.stop.prevent="changeQuantity(quantity - 1)" type="button" :disabled="outOfStock || quantity <= minQuantity">-</button>
+              <input 
+                type="number" 
+                name="quantity" 
+                x-model.number="quantity" 
+                :disabled="outOfStock" 
+                :min="minQuantity" 
+                :max="maxQuantity"
+                @input="changeQuantity($event.target.valueAsNumber)"
+              >
+              <button @click.stop.prevent="changeQuantity(quantity + 1)" type="button" :disabled="outOfStock || quantity >= maxQuantity">+</button>
+            </div>
+            
+            <!-- Display dynamic total price -->
+            <div class="mt-3" style="font-weight:700; font-size:1.05rem; color:#fff;">
+              Total: <span x-text="appCurrency.format(variant.price * quantity, '{{ product.currency }}')"></span>
+            </div>
+            
+            <button type="button" @click="addToCart" class="purchase-button-v33" :disabled="outOfStock || addingToCart">
+              <span x-show="!addingToCart && !addedToCart">Add to Cart</span>
+              <span x-show="addingToCart">Adding...</span>
+              <span x-show="addedToCart">Go to Cart</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <!-- Trust & Payments Section -->
+            <div class="trust-payments-v33">
+              <div class="secure-checkout-v33">
+                <i class="fas fa-lock"></i>
+                <span>Secure SSL Encrypted Checkout</span>
+              </div>
+              <div class="payment-icons-v33">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-amex"></i>
+                <i class="fab fa-cc-paypal"></i>
+                <i class="fab fa-bitcoin"></i>
+              </div>
+            </div>
+
+            <!-- Why Choose Us Section -->
+            <div class="why-us-v33">
+              <h4 class="why-us-title-v33">Why Choose Us?</h4>
+              <ul class="why-us-list-v33">
+                <li><i class="fas fa-bolt"></i> Instant Delivery</li>
+                <li><i class="fas fa-shield-alt"></i> Secure & Undetected</li>
+                <li><i class="fas fa-headset"></i> 24/7 Customer Support</li>
+              </ul>
+            </div>
+
+            <!-- Guarantee Section -->
+            <div class="guarantee-v33">
+                <div class="guarantee-icon-v33">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="guarantee-text-v33">
+                    <h5 class="guarantee-title-v33">Satisfaction Guarantee</h5>
+                    <p>With thousands of reviews we are 100% sure you will be satisfied.</p>
+                </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .product-wrapper-v33 {
+    --cl-accent: {{ global.properties.theme_color | default('#e53e3e') }};
+    color: #e4e4e7;
+  }
+
+  /* Base Card Style */
+  .main-product-card-v33,
+  .features-section-v33,
+  .purchase-box-v33 {
+    background: linear-gradient(160deg, rgba(28, 32, 46, 0.7), rgba(18, 22, 32, 0.7));
+    border: 1px solid var(--cl-border, #2a2a2a);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    margin-bottom: 1.5rem;
+  }
+  
+  .product-grid-v33 { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+  @media (min-width: 768px) { .product-grid-v33 { grid-template-columns: 300px 1fr; } }
+  .product-image-container-v33 { border-radius: 1rem; overflow: hidden; }
+  .product-image-container-v33 img { width: 100%; height: 100%; object-fit: cover; }
+  .image-placeholder-v33 { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.2); }
+  
+  .product-title-v33 { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 1rem; }
+  
+  .status-tags-v33 { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+  .status-tag-v33 { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.85rem; border-radius: 99px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+  .status-tag-v33 .dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+  .status-tag-v33 .dot .pulsating { position: absolute; inset: 0; border-radius: 50%; animation: pulse-glow 2s infinite; background-color: currentColor; }
+  @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(2.5); opacity: 0; } }
+  .status-tag-v33.green { background-color: rgba(74, 222, 128, 0.1); color: #4ade80; }
+  .status-tag-v33.red { background-color: rgba(248, 113, 113, 0.1); color: #f87171; }
+  .status-tag-v33.yellow { background-color: rgba(250, 204, 21, 0.1); color: #facc15; }
+  .status-tag-v33.blue { background-color: rgba(96, 165, 250, 0.1); color: #60a5fa; }
+  .status-tag-v33.gray { background-color: rgba(156, 163, 175, 0.1); color: #9ca3af; }
+  .status-tag-v33.purple { background-color: rgba(168, 85, 247, 0.1); color: #a855f7; } /* NEU */
+
+  /* Payment Callout Block - UPDATED */
+  .payment-callout-v33 { display: flex; align-items: center; gap: 1rem; background-color: rgba(0,0,0,0.2); padding: 1rem; border-radius: 1rem; border: 1px solid var(--cl-border); }
+  .callout-content-v33 { flex-grow: 1; }
+  .callout-icon-v33 { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px; background-color: rgba(var(--cl-accent-rgb), 0.1); border: 1px solid rgba(var(--cl-accent-rgb), 0.2); border-radius: 12px; font-size: 1.1rem; color: var(--cl-accent); }
+  .callout-title-v33 { font-size: 0.9rem; font-weight: 600; color: #fff; margin: 0; }
+  .callout-text-v33 { font-size: 0.8rem; color: #a1a1aa; margin: 0.1rem 0 0; }
+  .callout-button-v33 { flex-shrink: 0; background-color: transparent; color: #a1a1aa; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid var(--cl-border); transition: all 0.2s ease; }
+  .callout-button-v33:hover { background-color: rgba(255,255,255,0.05); color: #fff; border-color: #4a4a4a; }
+
+  /* Description/Features Section */
+  .features-section-v33 { padding: 0; }
+  .feature-header-v33 { display: flex; align-items: center; gap: 0.75rem; padding: 1.25rem 2rem; border-bottom: 1px solid var(--cl-border); font-weight: 600; color: #fff; }
+  .feature-content-v33 { padding: 2rem; line-height: 1.7; color: #d4d4d8; }
+
+  /* Purchase Box */
+  .purchase-box-v33 { padding: 1.5rem; }
+  .purchase-title-v33 { font-size: 0.8rem; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+  
+  .variant-selector-v33 { display: flex; flex-direction: column; gap: 0.75rem; }
+  .variant-option-v33 { display: flex; justify-content: space-between; align-items: center; background-color: rgba(0,0,0,0.2); padding: 1rem; border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.2s ease; }
+  .variant-option-v33:not(.disabled):hover { background-color: rgba(255,255,255,0.05); border-color: #4a4a4a; }
+  .variant-option-v33.active { border-color: var(--cl-accent); background-color: rgba(var(--cl-accent-rgb), 0.1); }
+  .variant-option-v33.disabled { opacity: 0.5; cursor: not-allowed; }
+  .variant-info-v33 .name { font-weight: 600; color: #fff; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .badge-v33 { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 0.35rem; }
+  .badge-v33.best-seller { background-color: #e53e3e; color: #fff; }
+  .badge-v33.most-value { background-color: #e53e3e; color: #fff; }
+  .stock-info-v33 { font-size: 0.8rem; color: #9ca3af; margin-top: 0.25rem; }
+  .stock-info-v33.in-stock { color: #4ade80; }
+  .stock-info-v33.out-of-stock { color: #f87171; }
+  .daily-price { color: #718096; }
+  .variant-option-v33 .price { font-weight: 700; color: #fff; font-size: 1.1rem; }
+  
+  .quantity-input-v33 { display: flex; border: 1px solid var(--cl-border); border-radius: 0.5rem; overflow: hidden; background: rgba(0,0,0,0.2); }
+  .quantity-input-v33 input { width: 100%; background: transparent; color: #fff; text-align: center; border: none; padding: 0.5rem; font-size: 1rem; }
+  .quantity-input-v33 button { width: 40px; background: transparent; border: none; color: #fff; font-size: 1.25rem; transition: background-color 0.2s ease; }
+  .quantity-input-v33 button:not(:disabled):hover { background-color: rgba(255,255,255,0.1); }
+  .quantity-input-v33 button:disabled { opacity: 0.4; cursor: not-allowed; }
+  
+  .purchase-button-v33 { display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; background: var(--cl-accent); color: white; font-weight: 700; font-size: 1.1rem; padding: 0.8rem 1rem; border-radius: 0.75rem; border: none; margin-top: 1.5rem; transition: all 0.2s ease; }
+  .purchase-button-v33:not(:disabled):hover { filter: brightness(1.15); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(var(--cl-accent-rgb), 0.2); }
+  .purchase-button-v33:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* Trust & Payments Section */
+  .trust-payments-v33 { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--cl-border); }
+  .secure-checkout-v33 { display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.8rem; color: #a1a1aa; margin-bottom: 1rem; }
+  .payment-icons-v33 { display: flex; justify-content: center; align-items: center; gap: 1rem; font-size: 1.75rem; color: #718096; }
+  .payment-icons-v33 i { transition: color 0.2s; }
+  .payment-icons-v33 i:hover { color: #d4d4d8; }
+
+  /* Why Choose Us Section */
+  .why-us-v33 { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--cl-border); }
+  .why-us-title-v33 { text-align: center; font-size: 0.8rem; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+  .why-us-list-v33 { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+  .why-us-list-v33 li { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; font-weight: 500; color: #d4d4d8; }
+  .why-us-list-v33 i { color: var(--cl-accent); width: 16px; text-align: center; }
+
+  /* Guarantee Section - NEW */
+  .guarantee-v33 {
+    margin-top: 1.5rem; padding: 1rem;
+    display: flex; align-items: center; gap: 1rem;
+    background-color: rgba(74, 222, 128, 0.05);
+    border: 1px solid rgba(74, 222, 128, 0.1);
+    border-radius: 0.75rem;
+  }
+  .guarantee-icon-v33 { font-size: 1.5rem; color: #4ade80; }
+  .guarantee-title-v33 { font-weight: 600; color: #fff; font-size: 0.9rem; margin: 0; }
+  .guarantee-text-v33 p { font-size: 0.8rem; color: #a1a1aa; margin: 0.1rem 0 0; }
+
+</style>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  // The Alpine.js data and methods are unchanged as they handle logic, not styling.
+  Alpine.data('productFormV29', () => ({
+    product: {{ product | json }},
+    activeVariant: 0,
+    quantity: 1,
+    addingToCart: false,
+    addedToCart: false,
+    
+    init() {
+      const firstAvailable = this.product.variants.findIndex(v => v.stock !== 0);
+      this.activeVariant = firstAvailable >= 0 ? firstAvailable : 0;
+      // use the selected variant's min quantity if available
+      this.quantity = this.variant.quantity_min || 1;
+
+      // Watch for variant changes to reset quantity and button state
+      this.$watch('activeVariant', () => {
+        this.quantity = this.variant.quantity_min || 1;
+        this.addedToCart = false; // Reset button state on variant change
+      });
+
+      // Watch for manual quantity edits and clamp to allowed range
+      this.$watch('quantity', (q) => {
+        // Handle NaN or undefined
+        if (q === undefined || q === null || isNaN(q)) {
+          this.quantity = this.minQuantity;
+          return;
+        }
+        // clamp
+        this.quantity = Math.max(this.minQuantity, Math.min(q, this.maxQuantity));
+      });
+    },
+    
+    get variant() { return this.product.variants[this.activeVariant]; },
+    get outOfStock() { return this.variant && this.variant.stock === 0; },
+    get minQuantity() { return this.variant.quantity_min || 1; },
+    get maxQuantity() { return this.variant.quantity_max || 999; },
+
+    // total price reactive getter (number)
+    get totalPrice() { 
+      const price = (this.variant && this.variant.price) ? (this.variant.price * this.quantity) : 0;
+      return parseFloat(price);
+    },
+    
+    selectVariant(index) {
+      if (this.product.variants[index] && this.product.variants[index].stock !== 0) {
+        this.activeVariant = index;
+      }
+    },
+    
+    changeQuantity(newQty) {
+      // ensure numeric
+      if (typeof newQty === 'string') newQty = Number(newQty);
+      if (Number.isNaN(newQty)) {
+        // keep current quantity if invalid
+        this.quantity = this.quantity || this.minQuantity;
+        return;
+      }
+      this.quantity = Math.max(this.minQuantity, Math.min(newQty, this.maxQuantity));
+    },
+
+    addToCart() {
+      if (this.addedToCart) {
+        window.location.href = '{{ '/cart' | shopUrl }}';
+        return;
+      }
+      if (this.outOfStock) return;
+      
+      this.addingToCart = true;
+      
+      this.appCart.add(this.product.id, this.variant.id, this.quantity);
+
+      setTimeout(() => {
+        this.addedToCart = true;
+        this.addingToCart = false;
+      }, 1000);
+    }
+  }));
+});
+</script>

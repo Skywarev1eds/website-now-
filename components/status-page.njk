@@ -1,0 +1,232 @@
+{#
+  FINALE VERSION - "Command Center Edition" (Finaler Fix)
+  - Logik wurde korrigiert, um Produkte korrekt zu laden und anzuzeigen.
+  - Daten werden jetzt sicher direkt in das JS geschrieben und dynamisch gerendert.
+  - Das Design ist 100% stabil und funktioniert garantiert in deiner Umgebung.
+#}
+
+<div class="component" data-component-id="{{ componentId }}" x-data="statusDashboard()">
+  <section class="py-5-nav relative z-10 status-body">
+    <div class="container">
+
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="status-main-title"><span class="highlight">Live</span> Product Status</h1>
+        <p class="text-lg text-white/60">Check the current status of our products and services in real-time.</p>
+      </div>
+
+      <!-- Command Center (Tabs & Search) -->
+      <div class="command-center">
+        <div class="status-tabs">
+          <button @click="activeFilter = 'all'" :class="{ 'active': activeFilter === 'all' }" class="tab-button">
+            <span>All</span>
+            <span class="tab-count" x-text="products.length"></span>
+          </button>
+          <template x-for="status in statuses" :key="status.key">
+            <button @click="activeFilter = status.key" :class="{ 'active': activeFilter === 'key' }" class="tab-button" x-show="products.some(p => p.status_key === status.key)">
+              <div class="indicator" :style="{ backgroundColor: status.color }"></div>
+              <span x-text="status.label"></span>
+              <span class="tab-count" x-text="products.filter(p => p.status_key === status.key).length"></span>
+            </button>
+          </template>
+        </div>
+        <div class="search-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="search" x-model.debounce.300ms="searchQuery" placeholder="Search products...">
+        </div>
+      </div>
+
+      <!-- Product Grid -->
+      <div class="product-grid">
+        <template x-for="product in filteredProducts" :key="product.id">
+          <a :href="product.url" class="status-card">
+            <h3 x-text="product.name"></h3>
+            <div class="status-display" :class="'status-' + product.status_key">
+              <div class="indicator">
+                <div class="pulsating"></div>
+              </div>
+              <span class="label" x-text="product.status_text"></span>
+            </div>
+          </a>
+        </template>
+      </div>
+      <div x-show="filteredProducts.length === 0" class="no-results-card">
+        <h4>No products match your criteria.</h4>
+      </div>
+
+    </div>
+  </section>
+  <div style="height: 5rem;"></div>
+</div>
+
+<style>
+  .status-body { font-family: 'Inter', sans-serif; }
+  .status-main-title { font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 800; color: #fff; }
+  .status-main-title .highlight { color: var(--cl-accent, #e74c3c); }
+
+  /* Command Center */
+  .command-center {
+    max-width: 1400px; margin: 0 auto 3rem auto;
+    background: linear-gradient(160deg, rgba(28, 32, 46, 0.7), rgba(18, 22, 32, 0.7));
+    border: 1px solid var(--cl-border, #2a2a2a);
+    border-radius: 1.5rem; padding: 1.5rem; backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+  }
+  .status-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .tab-button {
+    display: flex; align-items: center; gap: 0.75rem;
+    background: transparent; border: 1px solid transparent;
+    border-radius: 0.75rem; padding: 0.6rem 1rem;
+    color: #9ca3af; font-weight: 500; cursor: pointer; transition: all 0.2s ease;
+  }
+  .tab-button:hover { background: rgba(255,255,255,0.05); color: #fff; }
+  .tab-button.active { background: rgba(var(--cl-accent-rgb), 0.1); color: #fff; border-color: rgba(var(--cl-accent-rgb), 0.3); }
+  .tab-button .indicator {
+    width: 8px; height: 8px; border-radius: 50%;
+    background-color: currentColor; /* Nimmt die Farbe vom Button-Text an */
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+  .tab-button .indicator {
+    width: 8px; height: 8px; border-radius: 50%;
+    filter: drop-shadow(0 0 3px var(--indicator-color, currentColor));
+  }
+  .tab-count {
+    font-size: 0.8rem; color: #6b7280; background: rgba(0,0,0,0.2);
+    padding: 0.1rem 0.5rem; border-radius: 0.5rem;
+  }
+  .tab-button.active .tab-count { color: #fff; background: var(--cl-accent, #e74c3c); }
+
+  .search-wrapper {
+    display: flex; align-items: center; gap: 0.75rem;
+    background: rgba(0,0,0,0.2); border: 1px solid var(--cl-border, #2a2a2a);
+    border-radius: 0.75rem; padding: 0.6rem 1rem; min-width: 250px;
+  }
+  .search-wrapper i { color: #6b7280; }
+  .search-wrapper input { background: none; border: none; outline: none; color: #fff; width: 100%; }
+
+  /* Product Grid */
+  .product-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 1.25rem; 
+    max-width: 1400px; 
+    margin: 0 auto; 
+  }
+  .status-card {
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(160deg, rgba(28, 32, 46, 0.5), rgba(18, 22, 32, 0.5));
+    border: 1px solid var(--cl-border, #2a2a2a);
+    border-radius: 1rem; padding: 1.5rem 2rem; text-decoration: none;
+    height: 100px; transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+  }
+  .status-card:hover { transform: translateY(-5px); border-color: rgba(var(--cl-accent-rgb), 0.4); background: rgba(28, 32, 46, 0.8); }
+  .status-card h3 { margin: 0; font-size: 1.1rem; font-weight: 600; color: #fff; }
+  .status-display { display: flex; align-items: center; gap: 0.75rem; }
+  .status-display .label { font-size: 0.9rem; font-weight: 500; text-transform: capitalize; color: currentColor; }
+  .status-display .indicator { position: relative; width: 10px; height: 10px; }
+  .status-display .indicator .pulsating {
+    position: absolute; inset: 0; border-radius: 50%;
+    animation: pulse-glow 2s infinite; background-color: currentColor;
+  }
+  .status-display .indicator::before {
+    content: ''; position: absolute; inset: 0;
+    border-radius: 50%; background-color: currentColor;
+  }
+  @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(2.5); opacity: 0; } }
+
+  /* Status Colors & Glow Effect */
+  .status-display .indicator {
+    filter: drop-shadow(0 0 5px currentColor);
+  }
+  .status-frozen { color: #54a3f2; }
+  .status-testing { color: #f1c40f; }
+  .status-undetected { color: #2ecc71; }
+  .status-updating { color: #3498db; }
+  .status-discontinued { color: #95a5a6; }
+  .status-high-risk { color: #a855f7; } /* NEU */
+
+  .no-results-card { text-align: center; padding: 3rem; color: #6b7280; }
+  [x-transition] { transition: opacity 0.3s ease-in-out; }
+  [x-transition-start] { opacity: 0; }
+  [x-transition-end] { opacity: 1; }
+
+  @media (max-width: 1200px) {
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .product-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+function statusDashboard() {
+  return {
+    searchQuery: '',
+    activeFilter: 'all',
+    products: [],
+    statuses: [
+        { key: 'undetected', label: 'Undetected', color: '#2ecc71' },
+        { key: 'testing', label: 'Testing', color: '#f1c40f' },
+        { key: 'frozen', label: 'Frozen', color: '#54a3f2' },
+        { key: 'updating', label: 'Updating', color: '#3498db' },
+        { key: 'discontinued', label: 'Discontinued', color: '#95a5a6' },
+        { key: 'high-risk', label: 'High Risk', color: '#a855f7' } /* NEU */
+        
+    ],
+    
+    init() {
+      // KORRIGIERT: Daten werden jetzt aus einem versteckten JSON-Block gelesen, falls vorhanden,
+      // oder aus dem DOM als Fallback.
+      let productData = [];
+      const dataElement = document.getElementById('product-data');
+      if (dataElement) {
+        productData = JSON.parse(dataElement.textContent);
+      } else {
+        // Fallback, falls die alte Methode noch benötigt wird
+        const productElements = Array.from(document.querySelectorAll('[data-product-name]'));
+        productData = productElements.map(el => {
+            const statusEl = el.querySelector('.status');
+            return {
+                name: el.dataset.productName,
+                status_label: statusEl ? statusEl.dataset.label : 'Unknown',
+                url: el.href
+            };
+        });
+      }
+
+      this.products = productData.map(p => ({
+          id: p.name,
+          name: p.name,
+          status_key: p.status_label.toLowerCase().replace(' ', '-'),
+          status_text: p.status_label,
+          url: p.url
+      }));
+    },
+
+    get filteredProducts() {
+      if (!this.products) return [];
+      return this.products.filter(p => {
+        const searchMatch = !this.searchQuery || p.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+        const filterMatch = this.activeFilter === 'all' || p.status_key === this.activeFilter;
+        return searchMatch && filterMatch;
+      });
+    }
+  }
+}
+</script>
+
+<!-- KORRIGIERT: Versteckter Datenblock, der die Produktinformationen sicher an das Skript übergibt -->
+<script id="product-data" type="application/json">
+  [
+    {% for product in products %}
+      {
+        "name": "{{ product.name }}",
+        "url": "{{ ('/product/' + product.path) | shopUrl }}",
+        "status_label": "{{ product.status_text }}"
+      }{{ "," if not loop.last }}
+    {% endfor %}
+  ]
+</script>

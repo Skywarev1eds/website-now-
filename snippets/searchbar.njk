@@ -1,0 +1,88 @@
+{% set alignClassMap = {
+  'left': '',
+  'center': 'mx-auto',
+  'right': 'ml-auto'
+} %}
+
+{% set alignClass = alignClassMap[alignment] %}
+
+<div class="mb-4" x-data="searchbar">
+  <div class="flex items-center gap-4 max-w-xl bg-white/5 text-accent-200 rounded-xl p-4 {{ alignClass }} cursor-pointer focus-within:ring-2 focus-within:ring-accent-500" @click="openModal" data-dsr>
+    <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"><path fill="currentColor" d="M9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l5.6 5.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-5.6-5.6q-.75.6-1.725.95T9.5 16m0-2q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14"/></svg>
+    <input type="text" class="bg-transparent focus:outline-none" placeholder="Search for products..." readonly />
+  </div>
+
+  <div x-show="modalOpen" class="fixed inset-0 z-20 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen px-2 text-center md:items-center sm:p-0">
+      <div x-cloak @click="closeModal" x-show="modalOpen"
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="opacity-0" 
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="opacity-100" 
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 transition-opacity bg-black/75" aria-hidden="true"
+      ></div>
+
+      <div x-cloak x-show="modalOpen" 
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        class="inline-block w-full max-w-xl p-4 my-20 overflow-hidden text-left transition-all transform border-2 border-white/5 rounded-xl bg-background/75 backdrop-blur-lg text-t-primary sm:p-8 lg:max-w-3xl"
+      >
+        <div class="flex items-center justify-between gap-4 mb-4 sm:mb-8">
+          <div class="flex items-center gap-4 w-full bg-white/5 text-accent-200 rounded-xl p-2 cursor-pointer focus-within:ring-2 focus-within:ring-accent-500 sm:p-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-5 sm:size-6" viewBox="0 0 24 24"><path fill="currentColor" d="M9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l5.6 5.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-5.6-5.6q-.75.6-1.725.95T9.5 16m0-2q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14"/></svg>
+            <input type="text" class="bg-transparent focus:outline-none" placeholder="Search for products..." x-ref="searchInput" x-model="term">
+          </div>
+
+          <button @click="closeModal" class="text-t-primary focus:outline-none hover:text-accent">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-5 sm:size-6" viewBox="0 0 24 24"><path fill="currentColor" d="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275-.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></svg>
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-4" x-ref="productsContainer">
+          {% for product in sortedItems %}
+          {% if product.type != 'group' %}
+          {% render_snippet "product-card-horizontal.njk", product=product %}
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('searchbar', () => ({
+        modalOpen: false,
+        openModal() {
+          this.modalOpen = true;
+          document.body.style.overflow = 'hidden';
+          
+          setTimeout(() => {
+            this.$refs.searchInput.focus();
+          }, 100);
+        },
+        closeModal() {
+          this.modalOpen = false;
+          document.body.style.overflow = 'auto';
+        },
+        term: '',
+        init() {
+          this.$watch('term', () => {
+            this.$refs.productsContainer.querySelectorAll('.product').forEach((product) => {
+              if (product.dataset.title.toLowerCase().includes(this.term.toLowerCase())) {
+                product.classList.remove('hidden');
+              } else {
+                product.classList.add('hidden');
+              }
+            });
+          });
+        }
+      }));
+    });
+  </script>
+</div>

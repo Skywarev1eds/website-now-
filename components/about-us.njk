@@ -1,0 +1,190 @@
+<style>
+  .about-section {
+    padding: 6rem 0;
+    position: relative;
+    overflow: hidden; /* Wichtig, um den Glow zu kontrollieren */
+  }
+
+  .about-glow {
+    position: absolute;
+    top: 30%;
+    left: -10%;
+    width: 40vw;
+    height: 40vw;
+    background: radial-gradient(circle, rgba(229,62,62,0.05) 0%, rgba(229,62,62,0) 60%);
+    border-radius: 50%;
+    z-index: 0;
+  }
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+  
+  .highlight {
+    color: #e53e3e;
+  }
+  
+  .section-description {
+    color: #9ca3af;
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .feature-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 1.8rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 25px rgba(229, 62, 62, 0.3);
+    border-color: rgba(229, 62, 62, 0.4);
+  }
+  
+  .feature-icon, .feature-title, .feature-description {
+    position: relative;
+    z-index: 2;
+  }
+
+  .feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(229,62,62,0.1);
+    color: #e53e3e;
+    margin-bottom: 1.2rem;
+    font-size: 1.5rem;
+  }
+  
+  .feature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.8rem;
+  }
+  
+  .feature-description {
+    color: #9ca3af;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    flex-grow: 1;
+  }
+  
+  .scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .about-section.is-visible .scroll-animate {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .about-section.is-visible .features-grid .scroll-animate:nth-child(1) { transition-delay: 0.1s; }
+  .about-section.is-visible .features-grid .scroll-animate:nth-child(2) { transition-delay: 0.2s; }
+  .about-section.is-visible .features-grid .scroll-animate:nth-child(3) { transition-delay: 0.3s; }
+  .about-section.is-visible .features-grid .scroll-animate:nth-child(4) { transition-delay: 0.4s; }
+
+  @media (max-width: 768px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<section class="about-section component" data-component-id="about-us">
+  <div class="about-glow"></div>
+  
+  <div class="container">
+    <div class="section-header scroll-animate">
+      <h2 class="section-title">About <span class="highlight">SkyWare</span></h2>
+      <p class="section-description">
+        We aim to provide the best customer service & best products on the market! If you encounter any issues, or need any assistance. Please head over to our discord!
+      </p>
+    </div>
+    
+    <div class="features-grid">
+      
+      <div class="scroll-animate">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <h3 class="feature-title">Instant Delivery</h3>
+          <p class="feature-description">
+            We provide instant delivery for all of our producs to ensure the best experience for our customers.
+          </p>
+        </div>
+      </div>
+      
+      <div class="scroll-animate">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <h3 class="feature-title">24/7 Support</h3>
+          <p class="feature-description">
+            Our support team is available 24/7 to help you with any questions or issues you might have.
+          </p>
+        </div>
+      </div>
+      
+      <div class="scroll-animate">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="feature-title">Secure Payments</h3>
+          <p class="feature-description">
+            We use the latest technology to ensure that your payments are secure and your data is safe.
+          </p>
+        </div>
+      </div>
+      
+      <div class="scroll-animate">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-cubes"></i>
+          </div>
+          <h3 class="feature-title">Huge Selection</h3>
+          <p class="feature-description">
+            We offer a huge selection of products to ensure that you can find exactly what you need.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

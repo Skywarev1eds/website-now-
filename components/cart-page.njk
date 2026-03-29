@@ -1,0 +1,556 @@
+{% set imgScaleClass = ('object-scale-down' if global.properties.product_image_fit == 'scale-down' else 'object-cover') %}
+
+<section class="component" data-component-id="{{ componentId }}">
+  <div x-data="cartPage">
+    <div class="container mx-auto">
+      <div class="py-32 relative mb-8">
+        <div class="m-auto absolute inset-0 -z-10 aspect-square rounded-full blur-[200px] bg-accent-500/50 max-w-4xl -translate-y-1/2 w-[65%]" aria-hidden="true"></div>
+        <div class="container mx-auto relative">
+          <div class="mx-auto max-w-md text-center">
+            <h1 class="text-5xl !leading-[1.125] font-bold text-t-primary mb-4" data-dsr>
+              {% if properties.title %}{{ properties.title | renderString }}{% else %}Your <span class="text-accent-500">Cart</span>{% endif %}
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 md:p-0">
+        <div class="flex flex-col gap-4 mb-16 lg:flex-row lg:gap-8 lg:mb-32">
+          <div class="lg:w-3/4" data-dsr>
+            <div
+              x-cloak
+              x-show="fullCartShowMessages"
+              class="transition-opacity"
+              x-transition:enter="transition ease-out duration-300 transform"
+              x-transition:enter-start="opacity-0" 
+              x-transition:enter-end="opacity-100"
+              x-transition:leave="transition ease-in duration-200 transform"
+              x-transition:leave-start="opacity-100" 
+              x-transition:leave-end="opacity-0"
+            >
+              <div class="bg-accent-500/10 border-2 border-accent-500 text-accent-500 p-4 rounded-xl mb-4">
+                <template x-for="(message, index) in fullCartMessages" :key="index">
+                  <p x-text="message"></p>
+                </template>
+              </div>
+            </div>
+
+            <div>
+              <div x-show="fullCartLoading" class="p-4 border-2 border-white/5 rounded-xl bg-[rgba(255,255,255,0.01)] text-t-primary text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block text-accent-500 size-6 md:size-8 lg:size-10" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-dasharray="16" stroke-dashoffset="16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.97 0 9 4.03 9 9"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.2s" values="16;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></svg>
+              </div>
+
+              <template x-if="!fullCartLoading">
+                <div>
+                  <template x-if="fullCart.length === 0">
+                    <div class="p-4 border-2 border-white/5 rounded-xl bg-[rgba(255,255,255,0.01)] text-t-primary">
+                      <p class="text-center text-t-primary/75">Your cart is empty.</p>
+                    </div>
+                  </template>
+
+                  <template x-if="fullCart.length > 0">
+                    <div class="flex flex-col gap-3 md:gap-4 lg:gap-5">
+                      <template x-for="(cartItem, index) in fullCart" :key="index">
+                        <div class="flex flex-col p-1 sm:flex-row sm:justify-between sm:p-0 border-2 border-white/5 rounded-xl bg-[rgba(255,255,255,0.01)] text-t-primary">
+                          <div class="flex-1 flex gap-2 truncate sm:gap-3 md:gap-4">
+                            <div class="flex justify-center items-center w-full max-w-24 aspect-video relative pl-1 py-1 sm:max-w-36 sm:pl-3 sm:py-3">
+                              <template x-if="cartItem.product.image_url">
+                                <img :src="cartItem.product.image_url" class="aspect-video w-full rounded-lg {{ imgScaleClass }}" loading="lazy" />
+                              </template>
+                              <template x-if="!cartItem.product.image_url">
+                                <div class="aspect-video flex justify-center items-center text-accent-400">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="size-16" viewBox="0 0 256 256">
+                                    <path
+                                      fill="currentColor"
+                                      d="m222.72 67.91l-88-48.18a13.9 13.9 0 0 0-13.44 0l-88 48.18A14 14 0 0 0 26 80.18v95.64a14 14 0 0 0 7.28 12.27l88 48.18a13.92 13.92 0 0 0 13.44 0l88-48.18a14 14 0 0 0 7.28-12.27V80.18a14 14 0 0 0-7.28-12.27ZM127 30.25a2 2 0 0 1 1.92 0L212.51 76l-33.94 18.57l-84.52-46.26ZM122 223l-83-45.43a2 2 0 0 1-1-1.75V86.66l84 46ZM43.49 76l38.07-20.85l84.51 46.26L128 122.24ZM218 175.82a2 2 0 0 1-1 1.75L134 223v-90.36l36-19.71V152a6 6 0 0 0 12 0v-45.63l36-19.71Z"
+                                    />
+                                  </svg>
+                                </div>
+                              </template>
+                            </div>
+
+                            <div class="flex-1 text-left pr-2 py-1 truncate sm:pr-3 sm:py-3">
+                              <div class="flex justify-between items-center gap-2 truncate">
+                                <a :href="'{{ '/product/' | shopUrl }}' + cartItem.product.path" class="text-t-primary text-base font-bold truncate sm:text-lg hover:underline">
+                                  <span x-text="cartItem.product.name"></span>
+                                </a>
+                                <button
+                                  type="button"
+                                  @click="removeItem(index)"
+                                  class="text-t-primary focus:outline-none hover:text-accent-500 sm:hidden"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="size-4 sm:size-5" viewBox="0 0 24 24"><path fill="currentColor" d="m12 13.4l-4.9 4.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.9-4.9l-4.9-4.9q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.9 4.9l4.9-4.9q.275-.275.7-.275t.7.275t.275.7t-.275.7L13.4 12l4.9 4.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></svg>
+                                </button>
+                              </div>
+                              <p class="text-t-primary/75 text-xs truncate sm:text-sm" x-text="cartItem.variant.name"></p>
+                              <template x-if="getAvailableVolumeDiscount(index)">
+                                <div class="text-t-primary/50 text-xs truncate mt-0.5 sm:mt-1">
+                                  Buy <span x-text="getAvailableVolumeDiscount(index)?.quantity - cartItem.quantity"></span> more to get a <span x-text="getAvailableVolumeDiscount(index)?.percentage"></span>% discount.
+                                </div>
+                              </template>
+                              <template x-if="cartItem.addons && cartItem.addons.length > 0">
+                                <div class="flex items-center gap-1 mt-0.5 sm:mt-1">
+                                  <template x-for="(addon, addonIndex) in cartItem.addons" :key="addonIndex">
+                                    <div class="inline-block py-0.5 px-2 bg-white/5 border border-white/5 rounded-md text-t-primary/50 text-xs">
+                                      <span x-text="addon.product.name"></span>
+                                    </div>
+                                  </template>
+                                </div>
+                              </template>
+                            </div>
+                          </div>
+                          <div class="flex items-center justify-between pl-1 pr-4 pt-2 pb-1.5 mt-2 border-t border-t-white/5 sm:border-t-0 sm:justify-end sm:pl-0 sm:py-0 sm:mt-0 md:gap-6 lg:gap-8 lg:pr-8">
+                            <div class="max-w-32 flex rounded-lg overflow-hidden focus-within:border-accent-500 focus-within:ring-accent-500 focus-within:ring-2 focus-within:ring-opacity-50">
+                              <button
+                                type="button"
+                                @click="changeQuantity(index, cartItem.quantity - 1)"
+                                :disabled="cartItem.quantity <= getMinQuantity(index)"
+                                class="bg-white/10 hover:bg-accent-500 size-8 flex justify-center items-center transition-colors duration-300 ease-in-out disabled:pointer-events-none disabled:opacity-50"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24"><path fill="currentColor" d="M6 13q-.425 0-.712-.288T5 12t.288-.712T6 11h12q.425 0 .713.288T19 12t-.288.713T18 13z"/></svg>
+                              </button>
+                              <input
+                                type="number"
+                                x-model.number="cartItem.quantity"
+                                class="w-[calc(100%-64px)] bg-white/5 text-center text-t-primary text-sm focus:outline-none py-1.5 px-3 disabled:opacity-50"
+                              />
+                              <button
+                                type="button"
+                                @click="changeQuantity(index, cartItem.quantity + 1)"
+                                :disabled="cartItem.quantity >= getMaxQuantity(index)"
+                                class="bg-white/10 hover:bg-accent-500 size-8 flex justify-center items-center transition-colors duration-300 ease-in-out disabled:pointer-events-none disabled:opacity-50"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"/></svg>
+                              </button>
+                            </div>
+                            <div>
+                              <p class="text-base text-t-primary text-center font-medium sm:min-w-20 sm:text-lg">
+                                <span x-text="appCurrency.format(getItemSinglePrice(index), cartItem.product.currency)"></span>
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              @click="removeItem(index)"
+                              class="hidden text-t-primary focus:outline-none hover:text-accent sm:block"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" class="size-4 sm:size-5" fill="currentColor" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
+                            </button>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+          <div class="lg:w-1/4" data-dsr>
+            <div class="flex flex-col justify-between gap-4 rounded-xl bg-white/5 border-2 border-white/5 p-4 md:p-5 lg:p-6 text-t-primary" data-dsr>
+              
+              <!-- BANK TRANSFER CALLOUT -->
+              <div class="payment-callout-v29 mb-4" style="background-color: transparent; border: 1px solid rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 0.75rem;">
+                <div class="callout-content-v29">
+                    <div class="callout-icon-v29" style="background-color: rgba(255,255,255,0.05);"><i class="far fa-credit-card"></i></div>
+                    <div>
+                        <h3 class="callout-title-v29" style="color: #fff; font-size: 0.9rem;">Want to pay via Bank Transfer (IBAN)?</h3>
+                        <p class="callout-text-v29" style="font-size: 0.8rem;">Open a ticket in our server and we will get you sorted.</p>
+                    </div>
+                </div>
+                {% if shop.discord_url %}
+                <a href="{{ shop.discord_url }}" target="_blank" class="callout-button-v29" style="width: 100%; margin-top: 1rem; text-align: center; justify-content: center;">
+                    <i class="fab fa-discord"></i> Open a Ticket
+                </a>
+                {% endif %}
+              </div>
+              <!-- END BANK TRANSFER CALLOUT -->
+
+              <form @submit.prevent="checkout">
+                <div class="mb-4 pb-2 border-b border-y-white/5">
+                  <label class="block mb-2">Your Order</label>
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="text-sm text-t-primary/50">
+                        Subtotal
+                      </span>
+                      <span class="text-sm text-t-primary/75">
+                        <span x-text="appCurrency.format(cartTotalPrice, cartCurrency)"></span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- NEU: E-Mail-Feld für Gäste -->
+                {% if not shop_customer %}
+                <div class="mb-4">
+                  <label for="email" class="block mb-2 text-sm font-medium text-t-primary">Email for delivery</label>
+                  <input type="email" id="email" x-model="guestEmail" required class="bg-white/10 border border-white/20 text-t-primary text-sm rounded-lg focus:ring-accent-500 focus:border-accent-500 block w-full p-2.5" placeholder="your.email@example.com">
+                </div>
+                {% endif %}
+
+                {% if altcha %}
+                  <div
+                    x-cloak
+                    x-show="!altchaPayload"
+                    class="transition-opacity"
+                    x-transition:enter="transition ease-out duration-300 transform"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-200 transform"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                  >
+                    <altcha-widget
+                      challengejson='{{ altcha | json }}'
+                      auto="onload"
+                      hidefooter="true"
+                      hidelogo="true"
+                      x-ref="altcha"
+                    ></altcha-widget>
+                  </div>
+                {% endif %}
+
+                <div
+                  x-cloak
+                  x-show="submitError"
+                  class="transition-opacity"
+                  x-transition:enter="transition ease-out duration-300 transform"
+                  x-transition:enter-start="opacity-0" 
+                  x-transition:enter-end="opacity-100"
+                  x-transition:leave="transition ease-in duration-200 transform"
+                  x-transition:leave-start="opacity-100" 
+                  x-transition:leave-end="opacity-0"
+                >
+                  <div class="bg-red-500 border border-white/5 text-t-primary p-4 rounded-lg my-4">
+                    <span x-text="submitError"></span>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  :disabled="fullCartLoading || fullCart.length === 0 || isSubmitting || submitDisabled"
+                  class="px-6 py-2 mt-4 rounded-full w-full flex justify-center items-center gap-2 border-2 font-semibold bg-accent-500 border-accent-500 text-t-accent hover:enabled:bg-accent-500/50 hover:enabled:text-t-primary transition-colors duration-300 ease-in-out disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  <span>Checkout</span>
+                  <template x-if="!isSubmitting">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="currentColor" d="M7 22q-.825 0-1.413-.588T5 20q0-.825.588-1.413T7 18q.825 0 1.413.588T9 20q0 .825-.588 1.413T7 22Zm10 0q-.825 0-1.413-.588T15 20q0-.825.588-1.413T17 18q.825 0 1.413.588T19 20q0 .825-.588 1.413T17 22ZM11.3 9.3q-.275-.275-.275-.7t.275-.7l.875-.9H9q-.425 0-.713-.288T8 6q0-.425.288-.713T9 5h3.175l-.9-.9q-.3-.3-.288-.7t.313-.7q.3-.275.7-.288t.7.288l2.6 2.6q.15.15.212.325t.063.375q0 .2-.063.375T15.3 6.7l-2.6 2.6q-.275.275-.687.288T11.3 9.3ZM7 17q-1.15 0-1.738-.988T5.25 14.05L6.6 11.6L3 4H2q-.425 0-.713-.288T1 3q0-.425.288-.713T2 2h1.65q.275 0 .525.15t.375.425L8.525 11h7.025l3.6-6.5q.125-.225.35-.363T20 4q.575 0 .863.488t.012.987L17.3 11.95q-.275.5-.738.775T15.55 13H8.1L7 15h11q.425 0 .713.288T19 16q0 .425-.288.713T18 17H7Z"/></svg>
+                  </template>
+                  <template x-if="isSubmitting">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-dasharray="16" stroke-dashoffset="16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.97 0 9 4.03 9 9"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.2s" values="16;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></svg>
+                  </template>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('cartPage', () => ({
+      fullCart: [],
+      fullCartLoading: false,
+      fullCartMessages: [],
+      fullCartShowMessages: false,
+      isSubmitting: false,
+      submitError: null,
+      submitDisabled: false,
+      altchaPayload: null,
+      guestEmail: '', // NEU
+
+      init: function () {
+        if (this.appCart.items.length > 0) {
+          this.fetchFullCart();
+        }
+
+        {% if altcha %}
+          this.addAltchaEventListener();
+        {% endif %}
+      },
+
+      fetchFullCart: async function () {
+        this.fullCartLoading = true;
+        this.fullCartMessages = [];
+        this.fullCartShowMessages = false;
+
+        const url = new URL('{{ '/v1/cart' | apiInternalUrl }}');
+        url.searchParams.append('shopId', '{{ shop.id }}');
+        url.searchParams.append('cart', JSON.stringify(this.appCart.items));
+
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const responseData = await response.json();
+
+          if (responseData?.messages && responseData.messages.length > 0) {
+            this.fullCartMessages = responseData.messages;
+            this.fullCartShowMessages = true;
+            setTimeout(() => {
+              this.fullCartShowMessages = false;
+            }, 5000);
+          }
+
+          // Update full cart state (this one contains product names, images, etc.)
+          this.fullCart = responseData.fullCart;
+
+          // Update global cart state
+          this.appCart.set(responseData.cart);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          this.fullCartLoading = false;
+        }
+      },
+
+      getAvailableVolumeDiscount: function (index) {
+        const item = this.fullCart[index];
+
+        if (item.variant.volume_discounts) {
+          const volumeDiscounts = item.variant.volume_discounts.sort((a, b) => a.quantity - b.quantity);
+
+          for (const volumeDiscount of volumeDiscounts) {
+            if (item.quantity < parseInt(volumeDiscount.quantity)) {
+              return volumeDiscount;
+            }
+          }
+        }
+
+        return null;
+      },
+
+      getAppliedVolumeDiscount: function (index) {
+        const item = this.fullCart[index];
+
+        if (item.variant.volume_discounts) {
+          const volumeDiscounts = item.variant.volume_discounts.sort((a, b) => b.quantity - a.quantity);
+
+          for (const volumeDiscount of volumeDiscounts) {
+            if (item.quantity >= parseInt(volumeDiscount.quantity)) {
+              return volumeDiscount;
+            }
+          }
+        }
+
+        return null;
+      },
+
+      getMinQuantity: function (index) {
+        const item = this.fullCart[index];
+        
+        const min = item.variant.quantity_min || 1;
+
+        if (item.variant.stock === 0) {
+          return 0;
+        }
+
+        return min;
+      },
+
+      getMaxQuantity: function (index) {
+        const item = this.fullCart[index];
+        
+        const max = item.variant.quantity_max || 10000;
+
+        if (item.variant.stock === 0) {
+          return 0;
+        }
+
+        if (item.product.hide_stock_count) {
+          return max;
+        }
+
+        if (item.variant.stock === -1) {
+          return max;
+        }
+
+        return Math.min(max, item.variant.stock);
+      },
+
+      changeQuantity: function (index, quantity) {
+        const min = this.getMinQuantity(index);
+        const max = this.getMaxQuantity(index);
+        const newQuantity = Math.min(Math.max(min, quantity), max);
+
+        const item = this.fullCart[index];
+
+        this.fullCart[index].quantity = newQuantity;
+        this.appCart.editQuantity(item.variantId, newQuantity);
+      },
+
+      removeItem: function (index) {
+        const item = this.fullCart[index];
+
+        this.fullCart.splice(index, 1);
+
+        this.appCart.remove(item.variant.id);
+      },
+
+      getItemSinglePrice: function (index) {
+        const item = this.fullCart[index];
+
+        const volumeDiscount = this.getAppliedVolumeDiscount(index);
+
+        if (volumeDiscount) {
+          return item.variant.price * (1 - volumeDiscount.percentage / 100);
+        }
+
+        return item.variant.price;
+      },
+
+      get cartCurrency() {
+        return this.fullCart.length > 0 ? this.fullCart[0].product.currency : 'USD';
+      },
+
+      get cartTotalPrice() {
+        return this.fullCart.reduce((acc, item) => {
+          const itemSinglePrice = this.getItemSinglePrice(this.fullCart.indexOf(item));
+          const itemAddonsPrice = item.addons ? item.addons.reduce((sum, addon) => sum + addon.variant.price, 0) : 0;
+
+          return acc + (item.quantity * itemSinglePrice) + itemAddonsPrice;
+        }, 0);
+      },
+
+      addAltchaEventListener: function () {
+        this.$refs.altcha.addEventListener('statechange', (event) => {
+          if (event.detail.state === 'verifying') {
+            this.submitDisabled = true;
+          } else if (event.detail.state === 'verified') {
+            this.submitDisabled = false;
+            this.altchaPayload = event.detail.payload;
+          }
+        });
+      },
+
+      generateRecaptchaToken: async function () {
+        return new Promise((resolve) => {
+          grecaptcha.ready(
+            () =>
+              void (async () => {
+                const token = await grecaptcha.execute(
+                  '{{ shop.recaptcha_key }}',
+                  { action: 'checkout_s{{ shop.id }}' },
+                );
+
+                resolve(token);
+              })(),
+          );
+        });
+      },
+
+      checkout: async function () {
+        if (this.isSubmitting) {
+          return;
+        }
+
+        const formData = {
+          cart: this.appCart.items,
+          currency: this.appCurrency.currency,
+          shopId: '{{ shop.id }}',
+        };
+
+        // KORRIGIERT: E-Mail für Gäste oder eingeloggte Benutzer hinzufügen
+        if (window.shopCustomer?.email) {
+          formData.email = window.shopCustomer.email;
+        } else {
+          formData.email = this.guestEmail;
+        }
+
+        {% if altcha %}
+          if (this.altchaPayload) {
+            formData.altcha = this.altchaPayload;
+          }
+        {% elif shop.recaptcha_key %}
+          try {
+            formData.recaptchaToken = await this.generateRecaptchaToken();
+          } catch (error) {
+            this.submitError = 'reCAPTCHA cannot be loaded. Please refresh the page and turn off any ad blockers.';
+            this.isSubmitting = false;
+            return;
+          }
+        {% endif %}
+
+        try {
+          this.isSubmitting = true;
+
+          const response = await fetch('{{ '/v1/checkout' | apiInternalUrl }}', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          });
+
+          const responseData = await response.json();
+
+          if (responseData.url) {
+            localStorage.setItem('cart', JSON.stringify([]));
+            window.location.href = responseData.url;
+          } else {
+            this.isSubmitting = false;
+            this.submitError = responseData?.message || 'Error in the AJAX request.';
+          }
+        } catch (error) {
+          console.error(error);
+          this.isSubmitting = false;
+          this.submitError = 'Unexpected error. Please refresh the page and try again.';
+        }
+      }
+    }));
+  });
+</script>
+<style>
+/* Stile für den Hinweis-Block (aus product.njk übernommen) */
+.payment-callout-v29 {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background-color: transparent; /* Changed */
+  padding: 1rem; /* Changed */
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Changed */
+}
+.callout-content-v29 { display: flex; align-items: center; gap: 1rem; }
+.callout-icon-v29 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.05); /* Changed */
+  border-radius: 0.5rem;
+  font-size: 1.25rem;
+  color: #a1a1aa;
+}
+.callout-title-v29 { font-size: 0.9rem; font-weight: 600; color: #fff; margin: 0; }
+.callout-text-v29 { font-size: 0.8rem; color: #a1a1aa; margin: 0.25rem 0 0; }
+.callout-button-v29 {
+  width: 100%; /* Make button full width */
+  justify-content: center; /* Center content */
+  margin-top: 1rem; /* Add space on top */
+  background-color: #e53935;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px rgba(229, 57, 53, 0.3);
+}
+.callout-button-v29:hover { background-color: #c62828; filter: brightness(1.1); color: #fff; }
+</style>

@@ -1,0 +1,160 @@
+{#
+  FINALE VERSION 10.0 - "Command Deck - Signature Edition"
+  - Header-Text mit "Neon Glow"-Effekt für maximale Wirkung.
+  - Neue, stylishe "Direct Contact"-Sektion hinzugefügt.
+  - Abstand zum Footer vergrößert und Design finalisiert.
+#}
+
+<div class="component" data-component-id="terms-page-command-deck-signature">
+  <section class="py-5-nav relative z-10 tos-body-refined">
+    <div class="container">
+      
+      <div class="text-center mb-12">
+        <h1 class="tos-main-title">Terms of <span class="highlight">Service</span></h1>
+        <p class="text-lg text-white/60">The foundational rules of our partnership. Your trust is built on transparency.</p>
+      </div>
+
+      <div class="command-deck-wrapper" x-data="{ activeTab: 'scope' }">
+        <!-- Linke Navigation -->
+        <div class="command-deck-nav">
+          <ul>
+            <li @click="activeTab = 'scope'" :class="{ 'active': activeTab === 'scope' }"><i class="fa-solid fa-gavel"></i><span>Scope & Agreement</span></li>
+            <li @click="activeTab = 'account'" :class="{ 'active': activeTab === 'account' }"><i class="fa-solid fa-user-shield"></i><span>Accounts</span></li>
+            <li @click="activeTab = 'license'" :class="{ 'active': activeTab === 'license' }"><i class="fa-solid fa-key"></i><span>Delivery & License</span></li>
+            <li @click="activeTab = 'billing'" :class="{ 'active': activeTab === 'billing' }"><i class="fa-solid fa-credit-card"></i><span>Billing</span></li>
+            <li @click="activeTab = 'refunds'" :class="{ 'active': activeTab === 'refunds' }"><i class="fa-solid fa-ban"></i><span>Refunds</span></li>
+            <li @click="activeTab = 'support'" :class="{ 'active': activeTab === 'support' }"><i class="fa-solid fa-headset"></i><span>Support & Uptime</span></li>
+            <li @click="activeTab = 'liability'" :class="{ 'active': activeTab === 'liability' }"><i class="fa-solid fa-triangle-exclamation"></i><span>Risk & Liability</span></li>
+          </ul>
+        </div>
+
+        <!-- Rechter Inhaltsbereich -->
+        <div class="command-deck-content">
+          <div class="content-inner">
+            <template x-if="activeTab === 'scope'"><div x-transition><h3 class="content-title">1. Scope & Agreement</h3><p>These Terms of Service (“Terms”) govern your access to and use of Skyware’s digital products, licenses, and related services (collectively, the “Services”). By purchasing, downloading, or using the Services, you agree to these Terms.</p></div></template>
+            <template x-if="activeTab === 'account'"><div x-transition><h3 class="content-title">2. Eligibility & Accounts</h3><p>You must be at least 18 years old or have parental consent. You are responsible for safeguarding your account and purchase details. We reserve the right to suspend accounts for suspected abuse or violations.</p></div></template>
+            <template x-if="activeTab === 'license'"><div x-transition><h3 class="content-title">3. Delivery & License</h3><p>All products are digital goods delivered electronically. Licenses are non-exclusive, non-transferable, and for personal use only. Resale or sharing is strictly prohibited and results in immediate license revocation without refund.</p></div></template>
+            <template x-if="activeTab === 'billing'"><div x-transition><h3 class="content-title">4. Billing & Payments</h3><p>Prices are as displayed at the time of purchase. You must be an authorized user of the payment method. Fraudulent payments or chargebacks will result in account termination and a ban from our services.</p></div></template>
+            <template x-if="activeTab === 'refunds'"><div x-transition><h3 class="content-title">5. Refund Policy</h3><p><strong>All sales are final.</strong> Due to the digital nature of our products, we do not offer refunds or exchanges once a product has been delivered or activated. The only exceptions are verified cases of failed delivery or accidental duplicate charges.</p></div></template>
+            <template x-if="activeTab === 'support'"><div x-transition><h3 class="content-title">6. Support & Uptime</h3><p>We provide support for our products but do not guarantee 24/7 availability. Services may experience downtime for updates or due to third-party platform changes. No refunds will be provided for service downtime.</p></div></template>
+            <template x-if="activeTab === 'liability'"><div x-transition><h3 class="content-title">7. Risk & Liability</h3><p>The use of any third-party software comes with inherent risks, including account suspension or termination by the game publisher. You assume all risks. Skyware is not liable for any such actions or any loss resulting from the use of our services.</p></div></template>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEUE KONTAKT-SEKTION -->
+      <div class="contact-cta-panel">
+        <div class="cta-icon-wrapper">
+          <i class="fab fa-discord"></i>
+        </div>
+        <h4 class="fw-bold text-white mb-2">Still Have Questions?</h4>
+        <p class="text-white/70 mb-4">Our dedicated support team is available on Discord to assist you with any inquiries.</p>
+        <a href="https://discord.gg/skyware" class="btn-cta-discord" target="_blank">
+          <span>Join Support Server</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+      <div style="height: 5rem;"></div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .tos-body-refined { font-family: 'Inter', sans-serif; }
+  .global-background-glow { display: none !important; }
+
+  /* Überarbeiteter Header-Titel */
+  .tos-main-title {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: #fff;
+  }
+  .tos-main-title .highlight {
+    color: var(--cl-accent);
+  }
+
+  .command-deck-wrapper {
+    max-width: 1200px; margin: 0 auto; display: grid;
+    grid-template-columns: 300px 1fr; gap: 2rem;
+    background: linear-gradient(160deg, rgba(28, 32, 46, 0.7), rgba(18, 22, 32, 0.7));
+    border: 1px solid var(--cl-border); border-radius: 1.5rem;
+    padding: 1.5rem; backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+  }
+
+  .command-deck-nav ul { list-style: none; padding: 0; margin: 0; }
+  .command-deck-nav li {
+    display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
+    border-radius: 0.75rem; color: #a0aec0; font-weight: 600; cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    position: relative; border: 1px solid transparent;
+  }
+  .command-deck-nav li i { font-size: 1.1rem; width: 20px; text-align: center; transition: color 0.3s ease; }
+  
+  .command-deck-nav li:not(.active):hover {
+    color: #fff; background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  .command-deck-nav li.active {
+    color: #fff; background: linear-gradient(90deg, rgba(var(--cl-accent-rgb), 0.1), transparent);
+    border-color: rgba(var(--cl-accent-rgb), 0.3);
+    box-shadow: 0 0 20px rgba(var(--cl-accent-rgb), 0.2);
+  }
+  .command-deck-nav li.active i { color: var(--cl-accent); }
+
+  .command-deck-content {
+    position: relative; min-height: 500px;
+    border: 1px solid var(--cl-border); border-radius: 1.5rem;
+    background: linear-gradient(160deg, rgba(28, 32, 46, 0.5), rgba(18, 22, 32, 0.5));
+  }
+  
+  .content-inner { position: relative; padding: clamp(1.5rem, 4vw, 2.5rem); z-index: 2; }
+  .content-title { font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 1.5rem; }
+  [x-transition] { transition: opacity 0.2s ease-in-out; }
+  [x-transition-start] { opacity: 0; }
+  [x-transition-end] { opacity: 1; }
+  
+  .content-inner p { font-size: 1.1rem; line-height: 1.7; color: #cbd5e1; }
+  .content-inner strong { color: #fff; }
+  .content-inner a {
+    color: var(--cl-accent); text-decoration: none; font-weight: 600;
+    border-bottom: 1px solid transparent; transition: color 0.3s, border-color 0.3s;
+  }
+  .content-inner a:hover { color: #fff; border-color: #fff; }
+
+  /* Neue Kontakt-Sektion */
+  .contact-cta-panel {
+    max-width: 800px; margin: 5rem auto 0; text-align: center;
+    background: linear-gradient(160deg, rgba(28, 32, 46, 0.5), rgba(18, 22, 32, 0.5));
+    border: 1px solid var(--cl-border); border-radius: 1.5rem;
+    padding: 2.5rem; backdrop-filter: blur(10px);
+  }
+  .cta-icon-wrapper {
+    width: 60px; height: 60px; margin: 0 auto 1.5rem auto;
+    background: linear-gradient(145deg, rgba(var(--cl-accent-rgb), 0.1), rgba(var(--cl-accent-rgb), 0.2));
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; color: var(--cl-accent);
+    box-shadow: 0 0 20px rgba(var(--cl-accent-rgb), 0.3);
+  }
+  .btn-cta-discord {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    background: var(--cl-accent); color: white;
+    padding: 0.8rem 2rem; border-radius: 0.75rem;
+    font-weight: 600; text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(var(--cl-accent-rgb), 0.2);
+  }
+  .btn-cta-discord:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(var(--cl-accent-rgb), 0.3);
+    color: white;
+  }
+  .btn-cta-discord i { transition: transform 0.3s ease; }
+  .btn-cta-discord:hover i { transform: translateX(4px); }
+
+  @media (max-width: 992px) {
+    .command-deck-wrapper { grid-template-columns: 1fr; }
+    .command-deck-nav ul { display: flex; flex-wrap: wrap; justify-content: center; }
+  }
+</style>

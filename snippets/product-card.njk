@@ -1,0 +1,70 @@
+{# FINALE, FUNKTIONIERENDE VERSION - KOMPATIBEL MIT IHRER PRODUCTS.NJK #}
+<div class="card-wrapper-v12">
+  <a
+    class="product-card-v12"
+    href="{{ 'javascript:void(0);' if product.type == 'group' else ( ('/product/' + product.path) | shopUrl ) }}"
+    {% if product.type == 'group' %}
+      @click.prevent="openGroupModal('{{ product.id }}')"
+    {% endif %}
+  >
+    <!-- Bildbereich -->
+    <div class="card-image-container-v12">
+      {% set imageUrl = product.image_urls[0] if product.image_urls|length > 0 else product.image_url %}
+      {% if imageUrl %}
+        <img src="{{ imageUrl }}" class="card-image-v12" loading="lazy" alt="{{ product.name or 'Product' }}">
+      {% else %}
+        <div class="card-image-placeholder-v12 d-flex align-items-center justify-content-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16"><path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z"/></svg>
+        </div>
+      {% endif %}
+      <div class="image-overlay-v12"></div>
+    </div>
+
+    <!-- Inhaltsbereich -->
+    <div class="card-content-v12">
+      <h5 class="card-title-v12">{{ product.name or 'Unnamed Product' }}</h5>
+      <div class="card-meta-v12">
+        {% if product.type == 'group' %}
+          <span class="meta-badge-v12 group-badge-v12">{{ product.products | length }} Variants</span>
+        {% elif product.stock === 0 %}
+          <span class="meta-badge-v12 sold-out-badge-v12">Sold Out</span>
+        {% else %}
+          <span class="meta-badge-v12 available-badge-v12">Updated And Safe to Use</span>
+        {% endif %}
+      </div>
+      <div class="card-footer-info-v12">
+        <span class="price-v12">
+          {% if product.min_price %}
+            From {{ formatPrice(product.min_price, product.currency) }}
+          {% else %}
+            -
+          {% endif %}
+        </span>
+        <span class="arrow-icon-v12">→</span>
+      </div>
+    </div>
+  </a>
+</div>
+
+<style>
+/* SAUBERES CSS, DAS MIT IHRER STRUKTUR FUNKTIONIERT */
+.card-wrapper-v12 { transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; }
+.card-wrapper-v12:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); }
+.product-card-v12 { display: flex; flex-direction: column; height: 100%; background: linear-gradient(145deg, #1A1C2D, #111319); border-radius: 16px; overflow: hidden; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.08); position: relative; }
+.card-image-container-v12 { aspect-ratio: 16 / 10; position: relative; overflow: hidden; }
+.card-image-v12 { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+.product-card-v12:hover .card-image-v12 { transform: scale(1.05); }
+.image-overlay-v12 { position: absolute; inset: 0; background: linear-gradient(to top, rgba(20, 21, 27, 1) 5%, rgba(20, 21, 27, 0) 60%); }
+.card-image-placeholder-v12 { width: 100%; height: 100%; background-color: #1a1c2d; color: rgba(255, 255, 255, 0.2); }
+.card-content-v12 { padding: 1rem 1.25rem; margin-top: -2rem; z-index: 2; flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+.card-title-v12 { font-size: 1.1rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-meta-v12 { margin-bottom: 1rem; height: 24px; }
+.meta-badge-v12 { font-size: 0.75rem; font-weight: 500; padding: 0.25em 0.75em; border-radius: 99px; color: #fff; }
+.group-badge-v12 { background-color: rgba(70, 94, 255, 0.2); border: 1px solid rgba(70, 94, 255, 0.5); }
+.sold-out-badge-v12 { background-color: rgba(255, 70, 70, 0.2); border: 1px solid rgba(255, 70, 70, 0.5); }
+.available-badge-v12 { background-color: rgba(70, 255, 150, 0.2); border: 1px solid rgba(70, 255, 150, 0.5); }
+.card-footer-info-v12 { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+.price-v12 { font-size: 1rem; font-weight: 600; color: #a4acff; }
+.arrow-icon-v12 { font-size: 1.5rem; color: rgba(255, 255, 255, 0.3); transition: transform 0.3s ease, color 0.3s ease; }
+.product-card-v12:hover .arrow-icon-v12 { transform: translateX(5px); color: #fff; }
+</style>

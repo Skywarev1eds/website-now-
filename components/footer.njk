@@ -1,0 +1,132 @@
+<!-- NEUES STYLING FÜR DEN FOOTER -->
+<style>
+  .footer {
+    background-color: transparent;
+    border-top: 1px solid var(--cl-border);
+    padding: 3rem 0 1rem 0;
+  }
+
+  .footer h5 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-link-list .nav-item {
+    margin-bottom: 0.5rem;
+  }
+  
+  .footer-link-list .nav-link {
+    padding: 0 !important;
+    color: #9ca3af;
+    background: none !important;
+    border: none !important;
+    text-decoration: none;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+    display: inline-block;
+  }
+
+  .footer-link-list .nav-link:hover {
+    color: #fff;
+    padding-left: 8px;
+  }
+  
+  .footer-link-list .nav-link::before {
+    content: '›';
+    margin-right: 8px;
+    color: var(--cl-accent);
+    font-weight: 700;
+    transition: color 0.2s ease;
+  }
+  .footer-link-list .nav-link:hover::before {
+      color: #fff;
+  }
+
+  .footer .border-top {
+    border-color: var(--cl-border) !important;
+  }
+  
+  .footer-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+  }
+  .footer-logo {
+    height: 35px;
+  }
+</style>
+
+{% if global.components.footer.show_shop_name or global.components.footer.show_logo or global.components.footer.links.length > 0 or global.components.footer.show_socials %}
+<footer class="footer component" data-component-id="footer">
+  <div class="container">
+    <div class="row py-5">
+      <div class="col-12 col-md-6 col-lg-8 mb-4 mb-md-0">
+        <div class="footer-logo-wrap">
+          {% if global.components.footer.show_logo %}
+            <img src="https://i.ibb.co/0V8tqcYT/logo.png" alt="SkyWare Logo" class="footer-logo" />
+          {% endif %}
+          {% if global.components.footer.show_shop_name %}
+            <p class="fs-5 fw-bold m-0">{{ shop.name }}</p>
+          {% endif %}
+        </div>
+        <p class="text-muted mt-3">
+          Your one-stop shop for premium digital goods and services.
+        </p>
+      </div>
+
+      {% if global.components.footer.links.length > 0 %}
+      <div class="col-6 col-md-3 col-lg-2">
+        <h5>Navigation</h5>
+        <ul class="nav flex-column footer-link-list">
+          {% for link in global.components.footer.links %}
+          <li class="nav-item">
+            <a href="{{ link.link | shopUrl }}" target="{{ 'blank' if link.new_tab }}" class="nav-link">
+              {{ link.text if link.text else 'New Link' }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if global.components.footer.show_socials %}
+      {% if shop.discord_url or shop.telegram_url or shop.instagram_url or shop.tiktok_url %}
+      <div class="col-6 col-md-3 col-lg-2">
+        <h5>Socials</h5>
+        <ul class="nav flex-column footer-link-list">
+          {% if shop.discord_url %}
+          <li class="nav-item">
+            <a href="{{ shop.discord_url }}" class="nav-link" target="_blank">Discord</a>
+          </li>
+          {% endif %}
+          {% if shop.telegram_url %}
+          <li class="nav-item">
+            <a href="{{ shop.telegram_url }}" class="nav-link" target="_blank">Telegram</a>
+          </li>
+          {% endif %}
+          {% if shop.instagram_url %}
+          <li class="nav-item">
+            <a href="{{ shop.instagram_url }}" class="nav-link" target="_blank">Instagram</a>
+          </li>
+          {% endif %}
+          {% if shop.tiktok_url %}
+          <li class="nav-item">
+            <a href="{{ shop.tiktok_url }}" class="nav-link" target="_blank">TikTok</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between pt-4 mt-4 border-top">
+      <p class="text-muted">&copy; 2020 {{ shop.name }}. All rights reserved.</p>
+      <p class="text-muted">Theme Made by SkyWare™</p>
+    </div>
+  </div>
+</footer>
+{% endif %}

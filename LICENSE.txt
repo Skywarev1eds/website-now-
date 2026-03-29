@@ -1,0 +1,26 @@
+SellAuth Theme License
+
+Theme Name: Glow
+Licensed To: Skywarev1@gmail.com
+License Type: Single-Account License
+Platform: SellAuth (https://sellauth.com)
+
+---
+
+You are allowed to:
+- Use this theme on any number of shops within your SellAuth account.
+- View, edit, and download the theme files for personal use.
+- Customize the theme to suit your own stores on SellAuth.
+
+You are NOT allowed to:
+- Share, resell, or redistribute this theme.
+- Use this theme on another SellAuth account.
+- Use any part of this theme outside the SellAuth platform.
+
+---
+
+This theme is the property of SellAuth and is licensed, not sold. All rights reserved.
+
+If this license is violated, access to this theme may be revoked.
+
+© 2025 SellAuth

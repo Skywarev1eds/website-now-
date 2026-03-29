@@ -1,0 +1,265 @@
+<!-- HERO SECTION STYLING -->
+<style>
+/* Keyframes für die Eingangs-Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  padding-top: 4rem;
+  padding-bottom: 0; /* ANGEPASST: Kein Abstand nach unten, um die Icons näher zu rücken */
+}
+
+  .hero-glow {
+    position: absolute;
+    top: 10%;
+    right: 7%;
+    width: 35vw;
+    height: 35vw;
+    background: radial-gradient(circle, rgba(229,62,62,0.15) 0%, rgba(229,62,62,0) 55%);
+    border-radius: 50%;
+    z-index: 0;
+    animation: pulseGlow 8s infinite ease-in-out;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(90deg, #fff 0%, #d0d8f3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation-delay: 0.1s;
+  }
+
+  .highlighted-text {
+    color: #e53e3e;
+    font-weight: 600;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 2rem;
+    max-width: 600px;
+    animation-delay: 0.2s;
+  }
+
+  .hero-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+    animation-delay: 0.3s;
+  }
+
+  .feature-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 1.2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 25px rgba(229, 62, 62, 0.3);
+    border-color: rgba(229, 62, 62, 0.4);
+  }
+
+  .feature-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(229,62,62,0.1);
+    color: #e53e3e;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  
+  .feature-text h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: #fff;
+  }
+  
+  .feature-text p {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    margin: 0;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(90deg, #e53e3e 0%, #fd6b6b 100%);
+    color: white;
+    font-weight: 600;
+    padding: 0.9rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(229,62,62,0.3);
+    margin-top: 1rem;
+    animation-delay: 0.4s;
+  }
+
+  .hero-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.4s ease;
+    transform: skewX(-20deg);
+  }
+
+  .hero-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(229,62,62,0.4);
+    color: white;
+  }
+
+  .hero-cta:hover::before {
+    left: 100%;
+  }
+
+  .hero-cta svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .hero-image {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-image img {
+    max-width: 100%;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+  }
+
+  .floating-animation {
+    animation: floating 4s ease-in-out infinite, fadeInUp 0.8s ease-out forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
+  }
+
+  @keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+</style>
+
+<!-- HERO SECTION MARKUP -->
+<section class="hero-section">
+  <div class="hero-glow"></div>
+  
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 hero-content">
+        <h1 class="hero-title fade-in-up">
+          Unlock the Next Level<br>
+          with SkyWare Service
+        </h1>
+        <p class="hero-subtitle fade-in-up">
+          Experience advanced gaming enhancements, <span class="highlighted-text">undetected</span> & private.
+          Blazing fast. Ultra secure. <span class="highlighted-text">Ready for champions.</span>
+        </p>
+        
+        <div class="hero-features fade-in-up">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="feature-text">
+              <h4>Live Anti-Cheat Bypass</h4>
+              <p>Advanced protection systems</p>
+            </div>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-user-secret"></i>
+            </div>
+            <div class="feature-text">
+              <h4>Private & Undetected</h4>
+              <p>Secure and hidden builds</p>
+            </div>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="feature-text">
+              <h4>Instant Delivery & Support</h4>
+              <p>Quick access with full assistance</p>
+            </div>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="feature-text">
+              <h4>24/7 Status Monitoring</h4>
+              <p>Constant availability checks</p>
+            </div>
+          </div>
+        </div>
+        
+        <a href="/#products" class="hero-cta fade-in-up">
+          Browse through Products
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M13 5L20 12L13 19M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+      
+      <div class="col-lg-6 hero-image">
+        <img src="https://i.imgur.com/4ocSJUP.png" alt="SkyWare Gaming" class="floating-animation">
+      </div>
+    </div>
+  </div>
+</section>
